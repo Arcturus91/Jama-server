@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  database:
+    image:  postgres:15.1
+    environment:
+      - POSTGRES_DB=jama_db
+      - POSTGRES_USER=jamaAdmin
+      - POSTGRES_PASSWORD=123456
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres_data:/var/lib/postgresql
