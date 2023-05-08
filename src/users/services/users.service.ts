@@ -20,4 +20,9 @@ export class UsersService {
   async find(email) {
     return await this.userRepo.find({ where: { email } });
   }
+
+  async findOne(id: number) {
+    const user = await this.userRepo.findOne({ where: { id } });
+    return user;
+  }
 }

@@ -5,49 +5,41 @@ import {
   Get,
   Session,
   BadRequestException,
-  NotFoundException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { User } from '../entities/user.entity';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 
-@Controller('auth')
+@Controller()
+@UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
   ) {}
 
-  @Post('/signup')
+  @Post('/auth/signup')
   async createUser(
     @Body() body: CreateUserDto,
     @Session() session: any,
   ): Promise<User> {
     const { email, password } = body;
-    const hashedPassword = await this.authService.hashPassword(password);
-    const user = await this.usersService.create(email, hashedPassword);
+    const user = await this.authService.signup(email, password);
     session.userId = user.id;
     return user;
   }
 
-  @Post('/signin')
+  @Post('/auth/signin')
   async signIn(
     @Body() body: CreateUserDto,
     @Session() session: any,
   ): Promise<User> {
     const { email, password } = body;
-
-    const [user] = await this.usersService.find(email);
-    if (!user) throw new NotFoundException('User not found');
-
-    const isUser = await this.authService.comparePasswords(
-      password,
-      user.password,
-    );
-
-    if (!isUser) throw new BadRequestException('bad password');
-
+    const user = await this.authService.singin(email, password);
     session.userId = user.id;
     return user;
   }
@@ -62,5 +54,10 @@ export class UsersController {
     console.log(session.userId);
     if (!session.userId) throw new BadRequestException('not authorized');
     return this.usersService.findUsers();
+  }
+
+  @Get('/availableMeals')
+  getAvailableMeals(@CurrentUser() user: User) {
+    return user;
   }
 }
