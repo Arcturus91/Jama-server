@@ -3,6 +3,7 @@ import {
   Controller,
   Post,
   Get,
+  Session,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,19 +20,22 @@ export class UsersController {
   ) {}
 
   @Post('/signup')
-  async createUser(@Body() body: CreateUserDto): Promise<User> {
+  async createUser(
+    @Body() body: CreateUserDto,
+    @Session() session: any,
+  ): Promise<User> {
     const { email, password } = body;
     const hashedPassword = await this.authService.hashPassword(password);
-    return this.usersService.create(email, hashedPassword);
-  }
-
-  @Get('/findusers')
-  findUsers() {
-    return this.usersService.findUsers();
+    const user = await this.usersService.create(email, hashedPassword);
+    session.userId = user.id;
+    return user;
   }
 
   @Post('/signin')
-  async signIn(@Body() body: CreateUserDto): Promise<User> {
+  async signIn(
+    @Body() body: CreateUserDto,
+    @Session() session: any,
+  ): Promise<User> {
     const { email, password } = body;
 
     const [user] = await this.usersService.find(email);
@@ -44,6 +48,19 @@ export class UsersController {
 
     if (!isUser) throw new BadRequestException('bad password');
 
+    session.userId = user.id;
     return user;
+  }
+
+  @Post('/signout')
+  signOut(@Session() session: any) {
+    session.userId = null;
+  }
+
+  @Get('/findusers')
+  findUsers(@Session() session: any) {
+    console.log(session.userId);
+    if (!session.userId) throw new BadRequestException('not authorized');
+    return this.usersService.findUsers();
   }
 }

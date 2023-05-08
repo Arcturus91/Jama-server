@@ -18,7 +18,6 @@ export class UsersService {
   }
 
   async find(email) {
-    console.log('i am email ', email);
     return await this.userRepo.find({ where: { email } });
   }
 }
