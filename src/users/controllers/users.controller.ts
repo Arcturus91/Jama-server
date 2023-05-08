@@ -6,6 +6,7 @@ import {
   Session,
   BadRequestException,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -13,6 +14,7 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { User } from '../entities/user.entity';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
+import { AuthGuard } from 'src/guards/auth.guards';
 
 @Controller()
 @UseInterceptors(CurrentUserInterceptor)
@@ -57,6 +59,7 @@ export class UsersController {
   }
 
   @Get('/availableMeals')
+  @UseGuards(AuthGuard)
   getAvailableMeals(@CurrentUser() user: User) {
     return user;
   }

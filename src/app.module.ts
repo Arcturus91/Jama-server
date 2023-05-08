@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { MealsModule } from './meals/meals.module';
+import { ChefModule } from './chef/chef.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { UsersModule } from './users/users.module';
       retryAttempts: 10,
     }),
     UsersModule,
+    MealsModule,
+    ChefModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],
