@@ -7,8 +7,8 @@ import { Repository } from 'typeorm';
 export class UsersService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  create(email: string, password: string) {
-    const user = this.userRepo.create({ email, password });
+  registerUser(email: string, password: string, type: string) {
+    const user = this.userRepo.create({ email, password, type });
     return this.userRepo.save(user);
   }
 
@@ -17,11 +17,11 @@ export class UsersService {
     return allUsers;
   }
 
-  async find(email) {
+  async find(email: string) {
     return await this.userRepo.find({ where: { email } });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.userRepo.findOne({ where: { id } });
     return user;
   }

@@ -24,6 +24,9 @@ export class Meal {
   @Column('float')
   price: number;
 
+  @Column('integer')
+  availableAmount: number;
+
   @Column({ nullable: true })
   imageUrl: string;
 

@@ -5,6 +5,9 @@ import { UsersModule } from './users/users.module';
 import { MealsModule } from './meals/meals.module';
 import { ChefModule } from './chef/chef.module';
 import { OrdersModule } from './orders/orders.module';
+import { Meal } from './meals/entities/meal.entity';
+import { Order } from './orders/entities/orders.entities';
+import { Chef } from './chef/entities/chef.entity';
 
 @Module({
   imports: [
@@ -15,7 +18,7 @@ import { OrdersModule } from './orders/orders.module';
       username: 'jamaAdmin',
       password: '123456',
       database: 'jama_db',
-      entities: [User],
+      entities: [User, Meal, Order, Chef],
       synchronize: true,
       retryDelay: 3000,
       retryAttempts: 10,

@@ -1,16 +1,37 @@
+import { UserType } from 'src/constants/constants';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
+  OneToMany,
+  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 
 @Entity()
-export class Chef extends User {
+export class Chef {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column({ select: false })
+  password: string;
+
+  @Column({ nullable: true })
+  profileImageUrl: string;
+
+  @Column({ nullable: true })
+  phoneNumber: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
   @Column({ nullable: true })
   bio: string;
 
@@ -19,6 +40,12 @@ export class Chef extends User {
 
   @Column({ default: 0, nullable: true })
   totalRatings: number;
+
+  @Column({ default: '' })
+  address: string;
+
+  @Column()
+  type: string;
 
   //one single chef can have many meals
   @OneToMany(() => Meal, (meal) => meal.chef)

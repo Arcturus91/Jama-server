@@ -24,18 +24,18 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
-  @Post('/auth/signup')
+  @Post('/auth/signup/user')
   async createUser(
     @Body() body: CreateUserDto,
     @Session() session: any,
-  ): Promise<User> {
-    const { email, password } = body;
-    const user = await this.authService.signup(email, password);
+  ): Promise<Partial<User>> {
+    const { email, password, type } = body;
+    const user = await this.authService.signup(email, password, type);
     session.userId = user.id;
     return user;
   }
 
-  @Post('/auth/signin')
+  @Post('/auth/signin/user')
   async signIn(
     @Body() body: CreateUserDto,
     @Session() session: any,

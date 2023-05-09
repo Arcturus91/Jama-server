@@ -1,4 +1,4 @@
-import { Meal } from 'src/meals/entities/meal.entity';
+import { UserType } from 'src/constants/constants';
 import { Order } from 'src/orders/entities/orders.entities';
 import {
   Entity,
@@ -8,12 +8,6 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-
-export enum UserType {
-  USER = 'user',
-  CHEF = 'chef',
-  ADMIN = 'admin',
-}
 
 @Entity()
 export class User {
@@ -38,8 +32,11 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'enum', enum: UserType })
-  type: UserType;
+  @Column({ default: '' })
+  address: string;
+
+  @Column()
+  type: string;
 
   //one single user can have several orders
   @OneToMany(() => Order, (order) => order.user)
