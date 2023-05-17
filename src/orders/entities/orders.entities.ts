@@ -14,9 +14,6 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  status: string;
-
   @Column('float')
   totalPrice: number;
 
@@ -31,7 +28,7 @@ export class Order {
   user: User;
 
   @Column()
-  orderStatus: string; // required, onCooking, onDelivery, completed
+  orderStatus: string; // onSelection, required, onCooking, onDelivery, completed
 
   //many orders can have one single meal.
   //each order can contain one single meal, otherwise many to many would be necessary

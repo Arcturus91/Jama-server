@@ -9,10 +9,11 @@ import {
 import { ChefService } from '../services/chef.service';
 import { CreateMealDto } from 'src/meals/dtos/create-meal.dto';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { AuthGuard } from 'src/guards/auth.guards';
 import { CreateChefDto } from '../dtos/create-chef.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { Chef } from '../entities/chef.entity';
+import { ChefAuthGuard } from 'src/guards/chefAuth.guards';
+import { SignInChefDto } from '../dtos/signin-chef.dto';
 
 @Controller()
 export class ChefController {
@@ -33,8 +34,28 @@ export class ChefController {
     return chef;
   }
 
+  @Post('/auth/signin/chef')
+  async signIn(
+    @Body() body: SignInChefDto,
+    @Session() session: any,
+  ): Promise<Partial<Chef>> {
+    const { email, password, type } = body;
+    console.log(email, password);
+    const chef = await this.authService.signin(email, password, type);
+    session.chefId = chef.id;
+    session.type = chef.type;
+    return chef;
+  }
+
+  @Post('/chefsignout')
+  signOut(@Session() session: any) {
+    session.type = null;
+    session.chefId = null;
+    return session;
+  }
+
   @Post('/chef/createmeal')
-  @UseGuards(AuthGuard)
+  @UseGuards(ChefAuthGuard)
   async createMeal(
     @Body() body: CreateMealDto,
     @Session() session: any,

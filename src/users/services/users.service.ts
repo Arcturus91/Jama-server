@@ -21,7 +21,7 @@ export class UsersService {
     return allUsers;
   }
 
-  async find(email: string) {
+  async findUser(email: string) {
     return await this.userRepo.find({
       where: { email },
       select: ['id', 'password', 'type'],

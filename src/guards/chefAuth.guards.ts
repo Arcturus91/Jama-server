@@ -4,13 +4,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-export class AuthGuard implements CanActivate {
+export class ChefAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    if (!request.session.userId) {
-      throw new UnauthorizedException(
-        'You must be logged in to access this resource',
-      );
+    if (request.session.type !== 'chef') {
+      throw new UnauthorizedException('You must be chef to access this route');
     }
     return true;
   }

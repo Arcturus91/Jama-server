@@ -40,6 +40,7 @@ export class AuthService {
       );
       return user;
     } else if (type === UserType.CHEF) {
+      console.log('chef creation');
       const chef = await this.chefService.registerChef(
         email,
         hashedPassword,
@@ -49,14 +50,19 @@ export class AuthService {
     }
   }
 
-  async signin(email, password): Promise<User> {
-    const [user] = await this.usersService.find(email);
-    console.log(user);
-    if (!user) throw new NotFoundException('User not found');
-
-    const isUser = await this.comparePasswords(password, user.password);
-
-    if (!isUser) throw new BadRequestException('bad password');
-    return user;
+  async signin(email, password, type): Promise<User | Chef> {
+    if (type === UserType.USER) {
+      const [user] = await this.usersService.findUser(email);
+      if (!user) throw new NotFoundException('User not found');
+      const isUser = await this.comparePasswords(password, user.password);
+      if (!isUser) throw new BadRequestException('bad password');
+      return user;
+    } else if (type === UserType.CHEF) {
+      const [chef] = await this.chefService.findChef(email);
+      if (!chef) throw new NotFoundException('Chef not found');
+      const isChef = await this.comparePasswords(password, chef.password);
+      if (!isChef) throw new BadRequestException('bad password');
+      return chef;
+    }
   }
 }

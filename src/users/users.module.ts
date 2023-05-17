@@ -9,10 +9,17 @@ import { Order } from 'src/orders/entities/orders.entities';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { ChefService } from 'src/chef/services/chef.service';
 import { Chef } from 'src/chef/entities/chef.entity';
+import { OrdersService } from 'src/orders/services/orders.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Order, Meal, Chef])],
   controllers: [UsersController],
-  providers: [UsersService, AuthService, ChefService, CurrentUserInterceptor],
+  providers: [
+    UsersService,
+    AuthService,
+    ChefService,
+    CurrentUserInterceptor,
+    OrdersService,
+  ],
 })
 export class UsersModule {}

@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { UserType } from 'src/constants/constants';
 
-export class SignInUserDto {
+export class SignInChefDto {
   @IsEmail()
   @IsString()
   email: string;
@@ -19,6 +19,5 @@ export class SignInUserDto {
   phoneNumber: string;
 
   @IsEnum(UserType)
-  @IsOptional()
   type: string;
 }

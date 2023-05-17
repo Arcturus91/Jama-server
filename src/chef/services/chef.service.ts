@@ -16,6 +16,13 @@ export class ChefService {
     return this.chefRepo.save(chef);
   }
 
+  async findChef(email: string) {
+    return await this.chefRepo.find({
+      where: { email },
+      select: ['id', 'password', 'type'],
+    });
+  }
+
   createMeal(name: string, price: number, availableAmount: number, chef) {
     const meal = this.mealRepo.create({ name, price, availableAmount, chef });
     return this.mealRepo.save(meal);
