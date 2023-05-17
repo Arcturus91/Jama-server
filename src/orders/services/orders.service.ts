@@ -34,6 +34,8 @@ export class OrdersService {
     quantity: number,
   ): Promise<Order> {
     const orderedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
+    //!add validations of not enough meals. And thats why you need to do the findOne method: to get udpated status of meal.
+    //!to create an order or update an order should trigger some alert/message to chef and admin.
     console.log(orderedMeal);
     const totalPrice = orderedMeal.price * quantity;
     const orderStatus = 'onSelection';
