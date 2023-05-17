@@ -33,6 +33,11 @@ export class Meal {
   @Column({ default: true })
   isAvailable: boolean;
 
+  //agregar valoración de comida
+
+  @Column({ nullable: true })
+  mealStatus: string; //cooking, readyToBePickedUp
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -30,6 +30,9 @@ export class Order {
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
 
+  @Column()
+  orderStatus: string; // required, onCooking, onDelivery, completed
+
   //many orders can have one single meal.
   //each order can contain one single meal, otherwise many to many would be necessary
   @ManyToOne(() => Meal, (meal) => meal.orders)

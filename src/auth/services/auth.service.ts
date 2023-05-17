@@ -49,8 +49,9 @@ export class AuthService {
     }
   }
 
-  async singin(email, password): Promise<User> {
+  async signin(email, password): Promise<User> {
     const [user] = await this.usersService.find(email);
+    console.log(user);
     if (!user) throw new NotFoundException('User not found');
 
     const isUser = await this.comparePasswords(password, user.password);
