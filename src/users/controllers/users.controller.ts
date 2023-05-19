@@ -4,7 +4,6 @@ import {
   Post,
   Get,
   Session,
-  BadRequestException,
   UseInterceptors,
   UseGuards,
   Param,
@@ -20,6 +19,7 @@ import { SignInUserDto } from '../dtos/signin-user.dto';
 import { UserAuthGuard } from 'src/guards/userAuth.guards';
 import { OrdersService } from 'src/orders/services/orders.service';
 import { Order } from 'src/orders/entities/orders.entities';
+import { MealsService } from 'src/meals/services/meals.service';
 
 @Controller()
 @UseInterceptors(CurrentUserInterceptor)
@@ -28,6 +28,7 @@ export class UsersController {
     private usersService: UsersService,
     private authService: AuthService,
     private ordersService: OrdersService,
+    private mealsService: MealsService,
   ) {}
 
   @Post('/auth/signup/user')
@@ -38,6 +39,7 @@ export class UsersController {
     const { email, password, type } = body;
     const user = await this.authService.signup(email, password, type);
     session.userId = user.id;
+    session.type = user.type;
     return user;
   }
 
@@ -57,6 +59,7 @@ export class UsersController {
   signOut(@Session() session: any) {
     session.userId = null;
     session.type = null;
+    session.orderId = null;
     return session;
   }
 
@@ -79,7 +82,6 @@ export class UsersController {
   @Get('/availableMeals/:mealid')
   @UseGuards(UserAuthGuard)
   async showMealDetail(@Param('mealid') mealid: string): Promise<Meal> {
-    console.log('mealid en controller ', mealid);
     return this.usersService.showMealDetail(mealid);
   }
 
@@ -91,12 +93,22 @@ export class UsersController {
     @CurrentUser() user: User,
   ): Promise<Order> {
     const { mealId, quantity } = body;
+    const isMealValid = await this.mealsService.validateMealRequest(
+      mealId,
+      quantity,
+    );
+    if (!isMealValid) return;
     if (session.orderId) {
       const updatedOrder = await this.ordersService.updateOrder(
         mealId,
         +quantity,
         session.orderId,
       );
+      await this.mealsService.updateMeal(mealId, +quantity);
+      //!implement notification for chef : nodemailer
+      //!en el front, con la respuesta de este http response, el cliente recibe confirmación
+      //!creería que se debe crear un servicio para notificar al chef y al admin. El admin tiene su guard. sería como un usuario pero con un guard especial
+
       return updatedOrder;
       //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
     } else {
@@ -105,6 +117,7 @@ export class UsersController {
         mealId,
         +quantity,
       );
+      await this.mealsService.updateMeal(mealId, +quantity);
       session.orderId = newOrder.id;
       return newOrder;
     }

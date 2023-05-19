@@ -9,7 +9,9 @@ export class UserAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     console.log('session', request.session);
     if (request.session.type !== 'user') {
-      throw new UnauthorizedException('You must be user to access this route');
+      throw new UnauthorizedException(
+        'Debes estar registrado como usuario para revisar la siguiente ruta.',
+      );
     }
     return true;
   }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
@@ -37,8 +37,14 @@ export class UsersService {
     console.log(address);
 
     //! Código para encontrar las comidas cercanas al usuario en base a su dirección.
-
-    const availableMeals = await this.mealRepo.find();
+    //!not found exeption tira un error 404, por cierto.
+    const allMeals = await this.mealRepo.find();
+    if (allMeals.length === 0) {
+      throw new NotFoundException(
+        'No hay comidas disponibles por el momento. Intente luego',
+      );
+    }
+    const availableMeals = allMeals.filter((item) => item.isAvailable === true);
     return availableMeals;
   }
 

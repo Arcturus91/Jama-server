@@ -10,6 +10,7 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { ChefService } from 'src/chef/services/chef.service';
 import { Chef } from 'src/chef/entities/chef.entity';
 import { OrdersService } from 'src/orders/services/orders.service';
+import { MealsService } from 'src/meals/services/meals.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Order, Meal, Chef])],
@@ -20,6 +21,7 @@ import { OrdersService } from 'src/orders/services/orders.service';
     ChefService,
     CurrentUserInterceptor,
     OrdersService,
+    MealsService,
   ],
 })
 export class UsersModule {}
