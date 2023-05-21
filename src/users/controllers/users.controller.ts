@@ -64,7 +64,7 @@ export class UsersController {
   }
 
   //implement specific guard for user
-  @Get('/availableMeals')
+  @Get('/availablemeals')
   @UseGuards(UserAuthGuard)
   getAvailableMeals(@CurrentUser() user: User): Promise<Meal[]> {
     const availableMeals = this.usersService.getAvailableMeals(user.address);

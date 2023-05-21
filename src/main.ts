@@ -6,17 +6,23 @@ const cookieSession = require('cookie-session');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.use(
     cookieSession({
       keys: ['jamaCookies'],
+      httpOnly: false,
     }),
   );
-
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
     }),
   );
-  await app.listen(3000);
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:5005'],
+    credentials: true, // Set credentials to true
+  });
+
+  await app.listen(5005);
 }
 bootstrap();
