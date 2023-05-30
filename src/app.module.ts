@@ -9,11 +9,37 @@ import { Meal } from './meals/entities/meal.entity';
 import { Order } from './orders/entities/orders.entities';
 import { Chef } from './chef/entities/chef.entity';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
+      entities: [User, Meal, Order, Chef],
+      synchronize: true,
+      retryDelay: 3000,
+      retryAttempts: 10,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
+    }),
+    UsersModule,
+    MealsModule,
+    ChefModule,
+    OrdersModule,
+    AuthModule,
+  ],
+  controllers: [],
+  providers: [],
+})
+export class AppModule { }
+
+
+/*     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
@@ -24,15 +50,4 @@ import { ConfigModule } from '@nestjs/config';
       synchronize: true,
       retryDelay: 3000,
       retryAttempts: 10,
-    }),
-    UsersModule,
-    MealsModule,
-    ChefModule,
-    OrdersModule,
-    AuthModule,
-    ConfigModule.forRoot(),
-  ],
-  controllers: [],
-  providers: [],
-})
-export class AppModule { }
+    }), */
