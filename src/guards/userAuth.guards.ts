@@ -7,7 +7,6 @@ import {
 export class UserAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    console.log('only request', request);
     console.log('session incoming from frontend', request.session);
     if (request.session.type !== 'user') {
       throw new UnauthorizedException(

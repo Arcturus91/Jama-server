@@ -9,7 +9,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
-  ) {}
+  ) { }
 
   registerUser(email: string, password: string, type: string) {
     const user = this.userRepo.create({ email, password, type });
@@ -54,5 +54,14 @@ export class UsersService {
     return selectedMeal;
   }
 
-  //!Route: delete/ban user;
+  //!Route: delete/ban user : needs modification in entity.
+
+  async deleteUser(id: string) {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepo.delete(id);
+    return { message: 'User successfully deleted.' };
+  }
 }

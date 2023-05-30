@@ -7,6 +7,8 @@ import {
   UseInterceptors,
   UseGuards,
   Param,
+  Res,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -20,6 +22,8 @@ import { UserAuthGuard } from 'src/guards/userAuth.guards';
 import { OrdersService } from 'src/orders/services/orders.service';
 import { Order } from 'src/orders/entities/orders.entities';
 import { MealsService } from 'src/meals/services/meals.service';
+import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
+import { Response } from 'express';
 
 @Controller()
 @UseInterceptors(CurrentUserInterceptor)
@@ -29,7 +33,7 @@ export class UsersController {
     private authService: AuthService,
     private ordersService: OrdersService,
     private mealsService: MealsService,
-  ) {}
+  ) { }
 
   @Post('/auth/signup/user')
   async createUser(
@@ -43,16 +47,18 @@ export class UsersController {
     return user;
   }
 
-  @Post('/auth/signin/user')
-  async signIn(
+  @Post('/auth/login/user')
+  async login(
     @Body() body: SignInUserDto,
     @Session() session: any,
-  ): Promise<Partial<User>> {
+    @Res() res: Response,
+  ): Promise<void> {
     const { email, password, type } = body;
-    const user = await this.authService.signin(email, password, type);
-    session.userId = user.id;
-    session.type = user.type;
-    return user;
+    const { user, token } = await this.authService.login(email, password, type);
+    /*    session.userId = user.id;
+    session.type = user.type; */
+    res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
+    res.status(200).json(user);
   }
 
   @Post('/usersignout')
@@ -73,9 +79,8 @@ export class UsersController {
 
   //implement Guard: admin
   @Get('/findusers')
-  @UseGuards(UserAuthGuard)
+  /*  @UseGuards(JwtAuthGuard)  */// UserAuthGuard
   findUsers(@Session() session: any): Promise<User[]> {
-    console.log('session desde find users', session);
     return this.usersService.findUsers();
   }
 
@@ -125,5 +130,13 @@ export class UsersController {
 
   async putOrder() {
     //requires validation of payment
+  }
+
+  //delete a user
+  @Delete('/deleteuser/:userid')
+  async deleteUser(
+    @Param('userid') userid: string,
+  ): Promise<{ message: string }> {
+    return this.usersService.deleteUser(userid);
   }
 }

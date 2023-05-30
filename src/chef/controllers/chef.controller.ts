@@ -34,14 +34,14 @@ export class ChefController {
     return chef;
   }
 
-  @Post('/auth/signin/chef')
-  async signIn(
+  @Post('/auth/login/chef')
+  async login(
     @Body() body: SignInChefDto,
     @Session() session: any,
   ): Promise<Partial<Chef>> {
     const { email, password, type } = body;
     console.log(email, password);
-    const chef = await this.authService.signin(email, password, type);
+    const chef = await this.authService.login(email, password, type);
     session.chefId = chef.id;
     session.type = chef.type;
     return chef;

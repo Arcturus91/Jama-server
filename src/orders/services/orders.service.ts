@@ -10,7 +10,7 @@ export class OrdersService {
   constructor(
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
     @InjectRepository(Order) private orderRepo: Repository<Order>,
-  ) {}
+  ) { }
 
   async updateOrder(
     mealId: string,
@@ -49,6 +49,8 @@ export class OrdersService {
     console.log('meal added to order', newOrder);
     return this.orderRepo.save(newOrder);
   }
+
+
 }
 
 /*   async addMealToOrder(

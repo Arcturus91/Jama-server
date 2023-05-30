@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Chef } from 'src/chef/entities/chef.entity';
 import { ChefService } from 'src/chef/services/chef.service';
@@ -15,6 +16,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private chefService: ChefService,
+    private jwtService: JwtService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -49,14 +51,19 @@ export class AuthService {
       return chef;
     }
   }
-
-  async signin(email, password, type): Promise<User | Chef> {
+  /*   Promise<User | Chef>  */
+  async login(email, password, type): Promise<any> {
     if (type === UserType.USER) {
       const [user] = await this.usersService.findUser(email);
       if (!user) throw new NotFoundException('User not found');
       const isUser = await this.comparePasswords(password, user.password);
       if (!isUser) throw new BadRequestException('bad password');
-      return user;
+
+      const payload = { id: user.id, email: user.email, type: user.type };
+      const token = await this.jwtService.sign(payload);
+      const data = { user, token };
+
+      return data;
     } else if (type === UserType.CHEF) {
       const [chef] = await this.chefService.findChef(email);
       if (!chef) throw new NotFoundException('Chef not found');
@@ -64,5 +71,9 @@ export class AuthService {
       if (!isChef) throw new BadRequestException('bad password');
       return chef;
     }
+  }
+  getCookieWithJwtToken(token) {
+    const JWT_EXPIRATION_TIME = '3600';
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${JWT_EXPIRATION_TIME}`;
   }
 }

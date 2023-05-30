@@ -8,6 +8,7 @@ import { OrdersModule } from './orders/orders.module';
 import { Meal } from './meals/entities/meal.entity';
 import { Order } from './orders/entities/orders.entities';
 import { Chef } from './chef/entities/chef.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Chef } from './chef/entities/chef.entity';
     MealsModule,
     ChefModule,
     OrdersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
