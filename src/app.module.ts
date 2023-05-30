@@ -9,6 +9,7 @@ import { Meal } from './meals/entities/meal.entity';
 import { Order } from './orders/entities/orders.entities';
 import { Chef } from './chef/entities/chef.entity';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -29,8 +30,9 @@ import { AuthModule } from './auth/auth.module';
     ChefModule,
     OrdersModule,
     AuthModule,
+    ConfigModule.forRoot(),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

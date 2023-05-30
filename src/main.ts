@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieSession = require('cookie-session');
 import * as cookieParser from 'cookie-parser';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,6 +32,7 @@ async function bootstrap() {
     credentials: true, // Set credentials to true
   });
 
-  await app.listen(5005);
+  const port = app.get(ConfigService).get('PORT');
+  await app.listen(port || 5005);
 }
 bootstrap();
