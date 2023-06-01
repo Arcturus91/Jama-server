@@ -18,7 +18,7 @@ export class UsersService {
 
   async findUsers() {
     const allUsers = await this.userRepo.find();
-    if (!allUsers) throw new NotFoundException('No hay usuarios registrados')
+    if (!allUsers) throw new NotFoundException('No hay usuarios registrados');
     return allUsers;
   }
 

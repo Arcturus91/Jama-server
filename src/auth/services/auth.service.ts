@@ -17,7 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private chefService: ChefService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async hashPassword(password: string): Promise<string> {
     const saltOrRounds = 10;
@@ -31,49 +31,56 @@ export class AuthService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  async signup(email, password, type): Promise<User | Chef> {
+  async signup(email, password, type): Promise<any> {
+    let entity: User | Chef;
     const hashedPassword = await this.hashPassword(password);
     if (type === UserType.USER) {
-      console.log('user creation');
       const user = await this.usersService.registerUser(
         email,
         hashedPassword,
         type,
       );
-      return user;
+      entity = user;
     } else if (type === UserType.CHEF) {
-      console.log('chef creation');
       const chef = await this.chefService.registerChef(
         email,
         hashedPassword,
         type,
       );
-      return chef;
+      entity = chef;
     }
+    const data = await this.dataJwtSignedGenerator(entity);
+    return data;
   }
   /*   Promise<User | Chef>  */
   async login(email, password, type): Promise<any> {
+    let entity: User | Chef;
     if (type === UserType.USER) {
       const [user] = await this.usersService.findUser(email);
       if (!user) throw new NotFoundException('User not found');
       const isUser = await this.comparePasswords(password, user.password);
       if (!isUser) throw new BadRequestException('bad password');
-
-      const payload = { id: user.id, email: user.email, type: user.type };
-      const token = await this.jwtService.sign(payload);
-      const data = { user, token };
-
-      return data;
+      entity = user;
     } else if (type === UserType.CHEF) {
       const [chef] = await this.chefService.findChef(email);
       if (!chef) throw new NotFoundException('Chef not found');
       const isChef = await this.comparePasswords(password, chef.password);
       if (!isChef) throw new BadRequestException('bad password');
-      return chef;
+      entity = chef;
     }
+    const data = await this.dataJwtSignedGenerator(entity);
+    return data;
   }
   getCookieWithJwtToken(token) {
     const JWT_EXPIRATION_TIME = '3600';
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${JWT_EXPIRATION_TIME}`;
+  }
+
+  async dataJwtSignedGenerator(
+    entity: User | Chef,
+  ): Promise<{ entity: User | Chef; token: string }> {
+    const payload = { id: entity.id, email: entity.email, type: entity.type };
+    const token = await this.jwtService.sign(payload);
+    return { entity, token };
   }
 }

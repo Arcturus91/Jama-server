@@ -9,23 +9,38 @@ import { Meal } from './meals/entities/meal.entity';
 import { Order } from './orders/entities/orders.entities';
 import { Chef } from './chef/entities/chef.entity';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      entities: [User, Meal, Order, Chef],
-      synchronize: true,
-      retryDelay: 3000,
-      retryAttempts: 10,
-      extra: {
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      },
+      ...(process.env.NODE_ENV === 'production'
+        ? {
+          type: 'postgres',
+          url: process.env.DATABASE_URL,
+          entities: [User, Meal, Order, Chef],
+          synchronize: true,
+          retryDelay: 3000,
+          retryAttempts: 10,
+          extra: {
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          },
+        }
+        : {
+          type: 'postgres',
+          host: 'localhost',
+          port: 5432,
+          username: 'jamaAdmin',
+          password: '123456',
+          database: 'jama_db',
+          entities: [User, Meal, Order, Chef],
+          synchronize: true,
+          retryDelay: 3000,
+          retryAttempts: 10,
+        }),
     }),
     UsersModule,
     MealsModule,
@@ -37,17 +52,3 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   providers: [],
 })
 export class AppModule { }
-
-
-/*     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'jamaAdmin',
-      password: '123456',
-      database: 'jama_db',
-      entities: [User, Meal, Order, Chef],
-      synchronize: true,
-      retryDelay: 3000,
-      retryAttempts: 10,
-    }), */

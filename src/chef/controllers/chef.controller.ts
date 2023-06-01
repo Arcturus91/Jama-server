@@ -1,10 +1,11 @@
 import {
   Body,
   Controller,
-  Inject,
   Post,
-  Session,
+  Res,
   UseGuards,
+  Get,
+  Delete,
 } from '@nestjs/common';
 import { ChefService } from '../services/chef.service';
 import { CreateMealDto } from 'src/meals/dtos/create-meal.dto';
@@ -14,61 +15,60 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { Chef } from '../entities/chef.entity';
 import { ChefAuthGuard } from 'src/guards/chefAuth.guards';
 import { SignInChefDto } from '../dtos/signin-chef.dto';
+import { Response } from 'express';
 
 @Controller()
 export class ChefController {
   constructor(
     private chefService: ChefService,
     private authService: AuthService,
-  ) {}
+  ) { }
 
   @Post('/auth/signup/chef')
   async createChef(
     @Body() body: CreateChefDto,
-    @Session() session: any,
-  ): Promise<Partial<Chef>> {
+    @Res() res: Response,
+  ): Promise<void> {
     const { email, password, type } = body;
-    const chef = await this.authService.signup(email, password, type);
-    session.chefId = chef.id;
-    session.type = chef.type;
-    return chef;
+    const { chef, token } = await this.authService.signup(
+      email,
+      password,
+      type,
+    );
+    res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
+    res.status(200).json(chef);
   }
 
   @Post('/auth/login/chef')
   async login(
     @Body() body: SignInChefDto,
-    @Session() session: any,
-  ): Promise<Partial<Chef>> {
+    @Res() res: Response,
+  ): Promise<void> {
     const { email, password, type } = body;
-    console.log(email, password);
-    const chef = await this.authService.login(email, password, type);
-    session.chefId = chef.id;
-    session.type = chef.type;
-    return chef;
+    const { chef, token } = await this.authService.login(email, password, type);
+    res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
+    res.status(200).json(chef);
   }
 
-  @Post('/chefsignout')
-  signOut(@Session() session: any) {
-    session.type = null;
-    session.chefId = null;
-    return session;
+  @Post('/auth/logout')
+  signOut() {
+    console.log('logout request');
   }
 
-  @Post('/chef/createmeal')
-  @UseGuards(ChefAuthGuard)
-  async createMeal(
-    @Body() body: CreateMealDto,
-    @Session() session: any,
-  ): Promise<Meal> {
-    console.log('session en create meal', session);
-    const meal = await this.chefService.createMeal(
-      body.name,
-      body.price,
-      body.availableAmount,
-      session.chefId,
-    );
-    return meal;
-  }
+  /*   @Post('/chef/createmeal')
+    @UseGuards(ChefAuthGuard)
+    async createMeal(
+      @Body() body: CreateMealDto,
+    ): Promise<Meal> {
+  
+      const meal = await this.chefService.createMeal(
+        body.name,
+        body.price,
+        body.availableAmount,
+  
+      );
+      return meal;
+    } */
 
   //UPDATE MEALS
 
