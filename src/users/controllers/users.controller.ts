@@ -60,11 +60,6 @@ export class UsersController {
     res.status(200).json(user);
   }
 
-  @Get('/auth/logout')
-  signOut() {
-    console.log('logout request');
-  }
-
   //implement specific guard for user
   @Get('/availablemeals')
   @UseGuards(JwtAuthGuard)
@@ -85,6 +80,7 @@ export class UsersController {
   async showMealDetail(@Param('mealid') mealid: string): Promise<Meal> {
     return this.usersService.showMealDetail(mealid);
   }
+  //TODO: Define add meal order
   /* 
     @Post('/addmealorder')
    @UseGuards(JwtAuthGuard)

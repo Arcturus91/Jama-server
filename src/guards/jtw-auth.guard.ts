@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -10,11 +11,10 @@ import { jwtConstants } from 'src/constants/jtw.constants';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) { }
+  constructor(private jwtService: JwtService, public loger: Logger) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    console.log('cookies', request.cookies);
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();
@@ -25,8 +25,13 @@ export class JwtAuthGuard implements CanActivate {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['user'] = payload;
-      console.log('user data from jwt', request.user);
+      if (payload.type === 'user') {
+        request['user'] = payload;
+        Logger.log('user data from jwt', request.user);
+      } else if (payload.type === 'chef') {
+        request['chef'] = payload;
+        Logger.log('chef data from jwt', request.chef);
+      }
     } catch {
       throw new UnauthorizedException();
     }
@@ -38,6 +43,7 @@ export class JwtAuthGuard implements CanActivate {
     console.log('i am headers cookie', headers.cookie);
     const cookies = headers.cookie;
     if (!cookies) {
+      Logger.log('No cookies found');
       return undefined;
     }
 

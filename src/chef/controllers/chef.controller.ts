@@ -6,9 +6,11 @@ import {
   UseGuards,
   Get,
   Delete,
+  Param,
+  Put,
 } from '@nestjs/common';
 import { ChefService } from '../services/chef.service';
-import { CreateMealDto } from 'src/meals/dtos/create-meal.dto';
+import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { CreateChefDto } from '../dtos/create-chef.dto';
 import { AuthService } from 'src/auth/services/auth.service';
@@ -16,6 +18,8 @@ import { Chef } from '../entities/chef.entity';
 import { ChefAuthGuard } from 'src/guards/chefAuth.guards';
 import { SignInChefDto } from '../dtos/signin-chef.dto';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
+import { CurrentChef } from '../decorators/current-chef.decorator';
 
 @Controller()
 export class ChefController {
@@ -50,27 +54,40 @@ export class ChefController {
     res.status(200).json(chef);
   }
 
-  @Post('/auth/logout')
-  signOut() {
-    console.log('logout request');
+
+  @Post('/chef/createmeal')
+  @UseGuards(JwtAuthGuard)
+  async createMeal(
+    @CurrentChef() chef: Chef,
+    @Body() body: CreateMealDto,
+  ): Promise<Meal> {
+    const meal = await this.chefService.createMeal(
+      body.name,
+      body.price,
+      body.availableAmount,
+      chef,
+    );
+    return meal;
   }
 
-  /*   @Post('/chef/createmeal')
-    @UseGuards(ChefAuthGuard)
-    async createMeal(
-      @Body() body: CreateMealDto,
-    ): Promise<Meal> {
-  
-      const meal = await this.chefService.createMeal(
-        body.name,
-        body.price,
-        body.availableAmount,
-  
-      );
-      return meal;
-    } */
+  @Put('/chef/updatemeal/:id')
+  @UseGuards(JwtAuthGuard)
+  async updateMeal(
+    @Param('id') id: string,
+    @Body() body: UpdateMealDto,
+  ): Promise<Meal> {
+    const meal = await this.chefService.updateMeal(id, body);
+    return meal;
+  }
 
-  //UPDATE MEALS
+  @Get('/chef/getmeals')
+  @UseGuards(JwtAuthGuard)
+  async getChefMeals(@CurrentChef() chef: Chef): Promise<Meal[]> {
+    const meals = await this.chefService.getChefMeals(chef);
+    return meals;
+  }
 
   //ruta para valorar al comenzal.
+
+  //! crear ruta para valorar al chef.
 }

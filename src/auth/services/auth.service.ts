@@ -80,7 +80,7 @@ export class AuthService {
     entity: User | Chef,
   ): Promise<{ entity: User | Chef; token: string }> {
     const payload = { id: entity.id, email: entity.email, type: entity.type };
-    const token = await this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload);
     return { entity, token };
   }
 }

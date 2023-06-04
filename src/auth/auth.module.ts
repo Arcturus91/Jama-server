@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AuthController } from './controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/constants/jtw.constants';
@@ -21,7 +21,7 @@ import { JwtStrategy } from './jwt.strategy';
       signOptions: { expiresIn: '20h' },
     }),
   ],
-  providers: [ChefService, AuthService, UsersService, JwtStrategy],
+  providers: [ChefService, AuthService, UsersService, JwtStrategy, Logger],
   controllers: [AuthController],
 })
-export class AuthModule {}
+export class AuthModule { }

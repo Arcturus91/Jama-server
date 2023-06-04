@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from './services/users.service';
@@ -22,6 +22,7 @@ import { MealsService } from 'src/meals/services/meals.service';
     CurrentUserInterceptor,
     OrdersService,
     MealsService,
+    Logger,
   ],
 })
-export class UsersModule {}
+export class UsersModule { }

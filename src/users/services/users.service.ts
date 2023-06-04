@@ -1,18 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
+import { } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
-    @InjectRepository(Meal) private mealRepo: Repository<Meal>,
+    @InjectRepository(Meal) private mealRepo: Repository<Meal>
   ) { }
 
   registerUser(email: string, password: string, type: string) {
     const user = this.userRepo.create({ email, password, type });
+    if (user) Logger.log('@registerUser - User created successfully');
     return this.userRepo.save(user);
   }
 
@@ -31,6 +33,7 @@ export class UsersService {
 
   async findOne(id: string) {
     const user = await this.userRepo.findOne({ where: { id } });
+    if (user) Logger.log('@findOne - User found');
     return user;
   }
 
@@ -38,9 +41,10 @@ export class UsersService {
     console.log(address);
 
     //! Código para encontrar las comidas cercanas al usuario en base a su dirección.
-    //!not found exeption tira un error 404, por cierto.
+    //!not found exception tira un error 404, por cierto.
     const allMeals = await this.mealRepo.find();
     if (allMeals.length === 0) {
+      Logger.warn('@getAvailableMeals - No meals available at the moment');
       throw new NotFoundException(
         'No hay comidas disponibles por el momento. Intente luego',
       );
@@ -50,7 +54,6 @@ export class UsersService {
   }
 
   async showMealDetail(mealId: string): Promise<Meal> {
-    console.log(mealId);
     const selectedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
     return selectedMeal;
   }

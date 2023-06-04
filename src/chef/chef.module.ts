@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ChefController } from './controllers/chef.controller';
 import { ChefService } from './services/chef.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +11,6 @@ import { UsersService } from 'src/users/services/users.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Chef, Meal, User])],
   controllers: [ChefController],
-  providers: [ChefService, AuthService, UsersService],
+  providers: [ChefService, AuthService, UsersService, Logger],
 })
-export class ChefModule {}
+export class ChefModule { }
