@@ -1,6 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -20,16 +22,16 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const { id, type } = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      if (payload.type === 'user') {
-        request['user'] = payload;
+      if (type === 'user') {
+        request['user'] = { id, type };
         Logger.log('user data from jwt', request.user);
-      } else if (payload.type === 'chef') {
-        request['chef'] = payload;
+      } else if (type === 'chef') {
+        request['chef'] = { id, type };
         Logger.log('chef data from jwt', request.chef);
       }
     } catch {
@@ -40,11 +42,13 @@ export class JwtAuthGuard implements CanActivate {
 
   private extractTokenFromHeader(request: Request): string | undefined {
     const headers: any = request.headers;
-    console.log('i am headers cookie', headers.cookie);
     const cookies = headers.cookie;
     if (!cookies) {
       Logger.log('No cookies found');
-      return undefined;
+      throw new HttpException(
+        'Necesitas logearte primero',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const cookiePairs = cookies.split(';');

@@ -1,9 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Chef } from '../entities/chef.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
+import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
 
 @Injectable()
 export class ChefService {
@@ -25,19 +25,32 @@ export class ChefService {
     });
   }
 
-  createMeal(name: string, price: number, availableAmount: number, chef) {
-    const meal = this.mealRepo.create({ name, price, availableAmount, chef });
+  createMeal(body: CreateMealDto, chef: Chef) {
+    const meal = this.mealRepo.create({ ...body, chef });
     if (meal) Logger.log('@createMeal - meal created');
     return this.mealRepo.save(meal);
   }
 
-  async updateMeal(id, updateMealDto: UpdateMealDto): Promise<Meal> {
+  async updateMeal(
+    id: Meal['id'],
+    updateMealDto: UpdateMealDto,
+    chef: Chef,
+  ): Promise<Meal> {
     const { ...mealUpdates } = updateMealDto;
 
-    let meal = await this.mealRepo.findOne({ where: { id } });
+    let meal = await this.mealRepo.findOne({
+      where: { id },
+      relations: ['chef'],
+    });
 
+    if (chef.id !== meal.chef.id) {
+      throw new HttpException(
+        'No eres el creador de este plato. No estás permitido de modificarlo',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     if (!meal) {
-      throw new NotFoundException(`Comida #${id} not encontrada`);
+      throw new NotFoundException(`Plato #${id} not encontrada`);
     }
 
     meal = { ...meal, ...mealUpdates };

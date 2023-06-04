@@ -34,13 +34,13 @@ export class ChefController {
     @Res() res: Response,
   ): Promise<void> {
     const { email, password, type } = body;
-    const { chef, token } = await this.authService.signup(
+    const { entity, token } = await this.authService.signup(
       email,
       password,
       type,
     );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
-    res.status(200).json(chef);
+    res.status(200).json(entity);
   }
 
   @Post('/auth/login/chef')
@@ -61,22 +61,18 @@ export class ChefController {
     @CurrentChef() chef: Chef,
     @Body() body: CreateMealDto,
   ): Promise<Meal> {
-    const meal = await this.chefService.createMeal(
-      body.name,
-      body.price,
-      body.availableAmount,
-      chef,
-    );
+    const meal = await this.chefService.createMeal(body, chef);
     return meal;
   }
 
   @Put('/chef/updatemeal/:id')
   @UseGuards(JwtAuthGuard)
   async updateMeal(
+    @CurrentChef() chef: Chef,
     @Param('id') id: string,
     @Body() body: UpdateMealDto,
   ): Promise<Meal> {
-    const meal = await this.chefService.updateMeal(id, body);
+    const meal = await this.chefService.updateMeal(id, body, chef);
     return meal;
   }
 

@@ -40,13 +40,14 @@ export class UsersController {
     @Res() res: Response,
   ): Promise<void> {
     const { email, password, type } = body;
-    const { user, token } = await this.authService.signup(
+    const { entity, token } = await this.authService.signup(
       email,
       password,
       type,
     );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
-    res.status(200).json(user);
+
+    res.status(200).json(entity);
   }
 
   @Post('/auth/login/user')
@@ -55,9 +56,9 @@ export class UsersController {
     @Res() res: Response,
   ): Promise<void> {
     const { email, password, type } = body;
-    const { user, token } = await this.authService.login(email, password, type);
+    const { entity, token } = await this.authService.login(email, password, type);
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
-    res.status(200).json(user);
+    res.status(200).json(entity);
   }
 
   //implement specific guard for user
