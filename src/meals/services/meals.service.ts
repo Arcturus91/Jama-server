@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from '../entities/meal.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class MealsService {
-  constructor(@InjectRepository(Meal) private mealRepo: Repository<Meal>) {}
+  constructor(@InjectRepository(Meal) private mealRepo: Repository<Meal>) { }
 
   async validateMealRequest(
     mealId: string,
@@ -28,6 +28,11 @@ export class MealsService {
     let { availableAmount, isAvailable } = await this.mealRepo.findOne({
       where: { id: mealId },
     });
+
+    if (!availableAmount || !isAvailable) {
+      throw new BadRequestException('Plato no disponible / no encontrado');
+    }
+
     if (availableAmount > quantity) {
       availableAmount = availableAmount - quantity;
     } else {
@@ -36,6 +41,10 @@ export class MealsService {
     }
 
     const dataToUpdate = { availableAmount, isAvailable };
-    await this.mealRepo.update(mealId, dataToUpdate);
+    try {
+      await this.mealRepo.update(mealId, dataToUpdate);
+    } catch (e) {
+      throw new InternalServerErrorException('Error updating meal', e.message);
+    }
   }
 }

@@ -8,6 +8,8 @@ import {
   Param,
   Res,
   Delete,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -61,11 +63,10 @@ export class UsersController {
     res.status(200).json(entity);
   }
 
-  //implement specific guard for user
+
   @Get('/availablemeals')
-  @UseGuards(JwtAuthGuard)
-  getAvailableMeals(@CurrentUser() user: User): Promise<Meal[]> {
-    const availableMeals = this.usersService.getAvailableMeals(user.address);
+  getAvailableMeals(user: User): Promise<Meal[]> {
+    const availableMeals = this.usersService.getAvailableMeals();
     return availableMeals;
   }
 
@@ -76,49 +77,43 @@ export class UsersController {
     return this.usersService.findUsers();
   }
 
-  @Get('/availableMeals/:mealid')
+  @Get('/availablemeals/:mealid')
   @UseGuards(JwtAuthGuard)
   async showMealDetail(@Param('mealid') mealid: string): Promise<Meal> {
     return this.usersService.showMealDetail(mealid);
   }
-  //TODO: Define add meal order
-  /* 
-    @Post('/addmealorder')
-   @UseGuards(JwtAuthGuard)
-    async mealToOrder(
-      @Body() body: any,
-      @CurrentUser() user: User,
-    ): Promise<Order> {
-      const { mealId, quantity } = body;
-      const isMealValid = await this.mealsService.validateMealRequest(
-        mealId,
-        quantity,
-      );
-      if (!isMealValid) return;
-      if (session.orderId) {
-        const updatedOrder = await this.ordersService.updateOrder(
-          mealId,
-          +quantity,
-          session.orderId,
-        );
-        await this.mealsService.updateMeal(mealId, +quantity);
-        //!implement notification for chef : nodemailer
-        //!en el front, con la respuesta de este http response, el cliente recibe confirmación
-        //!creería que se debe crear un servicio para notificar al chef y al admin. El admin tiene su guard. sería como un usuario pero con un guard especial
-  
-        return updatedOrder;
-        //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
-      } else {
-        const newOrder = await this.ordersService.createOrderMeal(
-          user,
-          mealId,
-          +quantity,
-        );
-        await this.mealsService.updateMeal(mealId, +quantity);
-        session.orderId = newOrder.id;
-        return newOrder;
-      }
-    } */
+
+  @Post('/addmealorder')
+  @UseGuards(JwtAuthGuard)
+  async mealToOrder(
+    @Body() body: any,
+    @CurrentUser() user: User,
+  ): Promise<Order> {
+    const { mealId, quantity } = body;
+
+    const isMealValid = await this.mealsService.validateMealRequest(
+      mealId,
+      quantity,
+    );
+
+    if (!isMealValid) {
+      throw new HttpException('Invalid meal request', HttpStatus.BAD_REQUEST);
+    }
+
+    const newOrder = await this.ordersService.createOrderMeal(
+      user,
+      mealId,
+      +quantity,
+    );
+
+    await this.mealsService.updateMeal(mealId, +quantity);
+    return newOrder;
+    //session.orderId = newOrder.id;
+    //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
+    //!implement notification for chef : nodemailer
+    //!en el front, con la respuesta de este http response, el cliente recibe confirmación
+    //!creería que se debe crear un servicio para notificar al chef y al admin. El admin tiene su guard. sería como un usuario pero con un guard especial
+  }
 
   async putOrder() {
     //requires validation of payment
@@ -132,3 +127,13 @@ export class UsersController {
     return this.usersService.deleteUser(userid);
   }
 }
+
+/*     if (session.orderId) {
+      const updatedOrder = await this.ordersService.updateOrder(
+        mealId,
+        +quantity,
+        session.orderId,
+      );
+      await this.mealsService.updateMeal(mealId, +quantity);
+      return updatedOrder;
+    } else { */

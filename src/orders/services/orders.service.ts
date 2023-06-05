@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { Repository } from 'typeorm';
@@ -37,7 +37,10 @@ export class OrdersService {
     const orderedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
     // And thats why you need to do the findOne method: to get udpated status of meal.
     //!to create an order or update an order should trigger some alert/message to chef and admin.
-    console.log(orderedMeal);
+    if (!orderedMeal) {
+      throw new BadRequestException('plato no encontrado');
+    }
+
     const totalPrice = orderedMeal.price * quantity;
     const orderStatus = 'onSelection';
     const newOrder = this.orderRepo.create({
@@ -46,8 +49,13 @@ export class OrdersService {
       orderStatus,
       meal: orderedMeal,
     });
-    console.log('meal added to order', newOrder);
-    return this.orderRepo.save(newOrder);
+    try {
+      const savedOrder = await this.orderRepo.save(newOrder);
+      console.log('meal added to order', savedOrder);
+      return savedOrder;
+    } catch (e) {
+      throw new InternalServerErrorException('Error creating order', e.message);
+    }
   }
 
 

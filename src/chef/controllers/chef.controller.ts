@@ -15,7 +15,6 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { CreateChefDto } from '../dtos/create-chef.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { Chef } from '../entities/chef.entity';
-import { ChefAuthGuard } from 'src/guards/chefAuth.guards';
 import { SignInChefDto } from '../dtos/signin-chef.dto';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';

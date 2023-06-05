@@ -3,13 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
-    @InjectRepository(Meal) private mealRepo: Repository<Meal>
+    @InjectRepository(Meal) private mealRepo: Repository<Meal>,
   ) { }
 
   registerUser(email: string, password: string, type: string) {
@@ -37,10 +36,8 @@ export class UsersService {
     return user;
   }
 
-  async getAvailableMeals(address: string) {
-    console.log(address);
-
-    //! Código para encontrar las comidas cercanas al usuario en base a su dirección.
+  async getAvailableMeals() {
+    //TODO:Código para encontrar las comidas cercanas al usuario en base a su dirección.
     //!not found exception tira un error 404, por cierto.
     const allMeals = await this.mealRepo.find();
     if (allMeals.length === 0) {
@@ -54,7 +51,10 @@ export class UsersService {
   }
 
   async showMealDetail(mealId: string): Promise<Meal> {
-    const selectedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
+    const selectedMeal = await this.mealRepo.findOne({
+      where: { id: mealId },
+      relations: ['chef'],
+    });
     return selectedMeal;
   }
 
