@@ -53,6 +53,11 @@ export class ChefController {
     res.status(200).json(chef);
   }
 
+  @Get('/chef/getallchef')
+  async getAllChef(): Promise<Chef[]> {
+    const chefs = await this.chefService.findAllChef();
+    return chefs;
+  }
 
   @Post('/chef/createmeal')
   @UseGuards(JwtAuthGuard)
@@ -80,6 +85,24 @@ export class ChefController {
   async getChefMeals(@CurrentChef() chef: Chef): Promise<Meal[]> {
     const meals = await this.chefService.getChefMeals(chef);
     return meals;
+  }
+
+  @Get('/chef/:id')
+  @UseGuards(JwtAuthGuard)
+  async getChefById(@Param('id') id: string): Promise<Chef> {
+    const chef = await this.chefService.findChefById(id);
+    return chef;
+  }
+
+  @Put('/chef/updatechef/:id')
+  @UseGuards(JwtAuthGuard)
+  async updateChefInfo(
+    @CurrentChef() chef: Chef,
+    @Param('id') id: string,
+    @Body() body: UpdateChefDto,
+  ): Promise<Chef> {
+    const newChef = await this.chefService.updateChef(id, body, chef);
+    return newChef;
   }
 
   //ruta para valorar al comenzal.

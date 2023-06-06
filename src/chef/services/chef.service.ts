@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Chef } from '../entities/chef.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,7 +27,13 @@ export class ChefService {
   async findChef(email: string) {
     return await this.chefRepo.find({
       where: { email },
-      select: ['id', 'password', 'type'],
+      select: ['id', 'email', 'password', 'type'],
+    });
+  }
+
+  async findAllChef() {
+    return await this.chefRepo.find({
+      select: ['id', 'email', 'password', 'type'],
     });
   }
 
@@ -66,5 +78,9 @@ export class ChefService {
       throw new NotFoundException('No has creado comidas aún, chef.');
     }
     return chefMeals;
+  }
+
+  findChefById(id: string) {
+    return this.chefRepo.findOne({ where: { id }, relations: ['meals'] });
   }
 }
