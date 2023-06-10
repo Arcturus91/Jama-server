@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
+import { UpdateChefDto } from '../dtos/update-chef.dto';
 
 @Injectable()
 export class ChefService {
@@ -45,10 +46,10 @@ export class ChefService {
 
   async updateMeal(
     id: Meal['id'],
-    updateMealDto: UpdateMealDto,
+    updateMeal: UpdateMealDto,
     chef: Chef,
   ): Promise<Meal> {
-    const { ...mealUpdates } = updateMealDto;
+    const { ...mealUpdates } = updateMeal;
 
     let meal = await this.mealRepo.findOne({
       where: { id },
@@ -82,5 +83,23 @@ export class ChefService {
 
   findChefById(id: string) {
     return this.chefRepo.findOne({ where: { id }, relations: ['meals'] });
+  }
+
+  async updateChef(id: string, updateChef: UpdateChefDto, chef: Chef) {
+    if (id !== chef.id) {
+      throw new HttpException(
+        'No estás permitido de modificar otro chef',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const { ...chefUpdate } = updateChef;
+    let chefToModify = await this.chefRepo.findOne({ where: { id } });
+
+    if (!chefToModify) {
+      throw new NotFoundException(`Chef #${id} not encontrado`);
+    }
+
+    chefToModify = { ...chefToModify, ...chefUpdate };
+    return this.chefRepo.save(chefToModify);
   }
 }

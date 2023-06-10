@@ -19,6 +19,7 @@ import { SignInChefDto } from '../dtos/signin-chef.dto';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { CurrentChef } from '../decorators/current-chef.decorator';
+import { UpdateChefDto } from '../dtos/update-chef.dto';
 
 @Controller()
 export class ChefController {
@@ -63,8 +64,9 @@ export class ChefController {
   @UseGuards(JwtAuthGuard)
   async createMeal(
     @CurrentChef() chef: Chef,
-    @Body() body: CreateMealDto,
+    @Body() body: any,
   ): Promise<Meal> {
+    console.log('body', body);
     const meal = await this.chefService.createMeal(body, chef);
     return meal;
   }
@@ -101,6 +103,7 @@ export class ChefController {
     @Param('id') id: string,
     @Body() body: UpdateChefDto,
   ): Promise<Chef> {
+    console.log('body', body, id);
     const newChef = await this.chefService.updateChef(id, body, chef);
     return newChef;
   }

@@ -25,8 +25,6 @@ export class JwtAuthGuard implements CanActivate {
       const { id, type } = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
       if (type === 'user') {
         request['user'] = { id, type };
         Logger.log('user data from jwt', request.user);
