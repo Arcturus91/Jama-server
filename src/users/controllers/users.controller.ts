@@ -65,13 +65,13 @@ export class UsersController {
 
 
   @Get('/availablemeals')
-  getAvailableMeals(user: User): Promise<Meal[]> {
+  getAvailableMeals(): Promise<Meal[]> {
     const availableMeals = this.usersService.getAvailableMeals();
     return availableMeals;
   }
 
   //implement Guard: admin
-  @Get('/findusers')
+  @Get('/admin/findusers')
   @UseGuards(JwtAuthGuard)
   findUsers(): Promise<User[]> {
     return this.usersService.findUsers();
@@ -83,7 +83,7 @@ export class UsersController {
     return this.usersService.showMealDetail(mealid);
   }
 
-  @Post('/addmealorder')
+  @Post('/user/addmealorder')
   @UseGuards(JwtAuthGuard)
   async mealToOrder(
     @Body() body: any,
@@ -107,11 +107,9 @@ export class UsersController {
     );
 
     await this.mealsService.updateMeal(mealId, +quantity);
+
     return newOrder;
-    //session.orderId = newOrder.id;
     //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
-    //!implement notification for chef : nodemailer
-    //!en el front, con la respuesta de este http response, el cliente recibe confirmación
     //!creería que se debe crear un servicio para notificar al chef y al admin. El admin tiene su guard. sería como un usuario pero con un guard especial
   }
 
@@ -121,13 +119,21 @@ export class UsersController {
 
   //delete a user
   @Delete('/deleteuser/:userid')
+  @UseGuards(JwtAuthGuard)
   async deleteUser(
     @Param('userid') userid: string,
   ): Promise<{ message: string }> {
     return this.usersService.deleteUser(userid);
   }
-}
 
+
+  @Get('/user/:userid')
+  @UseGuards(JwtAuthGuard)
+  async getUserDetail(@Param('userid') userid: string): Promise<User> {
+    const user = this.usersService.findUserById(userid);
+    return user;
+  }
+}
 /*     if (session.orderId) {
       const updatedOrder = await this.ordersService.updateOrder(
         mealId,
@@ -137,3 +143,4 @@ export class UsersController {
       await this.mealsService.updateMeal(mealId, +quantity);
       return updatedOrder;
     } else { */
+

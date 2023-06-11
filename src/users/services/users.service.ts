@@ -23,23 +23,26 @@ export class UsersService {
     return allUsers;
   }
 
-  async findUser(email: string) {
+  async findUser(email: string): Promise<User[]> {
     return await this.userRepo.find({
       where: { email },
       select: ['id', 'email', 'password', 'type'],
     });
   }
 
-  async findOne(id: string) {
-    const user = await this.userRepo.findOne({ where: { id } });
-    if (user) Logger.log('@findOne - User found');
+  async findUserById(id: string) {
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: ['orders'],
+    });
+    if (!user) throw new NotFoundException('Usuario no registrado');
     return user;
   }
 
   async getAvailableMeals() {
     //TODO:Código para encontrar las comidas cercanas al usuario en base a su dirección.
     //!not found exception tira un error 404, por cierto.
-    const allMeals = await this.mealRepo.find();
+    const allMeals = await this.mealRepo.find({ relations: ['chef'] });
     if (allMeals.length === 0) {
       Logger.warn('@getAvailableMeals - No meals available at the moment');
       throw new NotFoundException(
