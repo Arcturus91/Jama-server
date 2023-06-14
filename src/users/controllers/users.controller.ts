@@ -19,12 +19,12 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import { SignInUserDto } from '../dtos/signin-user.dto';
-import { UserAuthGuard } from 'src/guards/userAuth.guards';
 import { OrdersService } from 'src/orders/services/orders.service';
 import { Order } from 'src/orders/entities/orders.entities';
 import { MealsService } from 'src/meals/services/meals.service';
 import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { Response } from 'express';
+import { TwilioWhatsappService } from 'src/twilio/twilio.service';
 
 @Controller()
 @UseInterceptors(CurrentUserInterceptor)
@@ -34,7 +34,8 @@ export class UsersController {
     private authService: AuthService,
     private ordersService: OrdersService,
     private mealsService: MealsService,
-  ) { }
+    private twilioWhatsappService: TwilioWhatsappService,
+  ) {}
 
   @Post('/auth/signup/user')
   async createUser(
@@ -58,11 +59,14 @@ export class UsersController {
     @Res() res: Response,
   ): Promise<void> {
     const { email, password, type } = body;
-    const { entity, token } = await this.authService.login(email, password, type);
+    const { entity, token } = await this.authService.login(
+      email,
+      password,
+      type,
+    );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
     res.status(200).json(entity);
   }
-
 
   @Get('/availablemeals')
   getAvailableMeals(): Promise<Meal[]> {
@@ -107,6 +111,10 @@ export class UsersController {
     );
 
     await this.mealsService.updateMeal(mealId, +quantity);
+    this.twilioWhatsappService.sendMessages(
+      newOrder.user.id,
+      newOrder.meal.name,
+    );
 
     return newOrder;
     //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
@@ -126,7 +134,6 @@ export class UsersController {
     return this.usersService.deleteUser(userid);
   }
 
-
   @Get('/user/:userid')
   @UseGuards(JwtAuthGuard)
   async getUserDetail(@Param('userid') userid: string): Promise<User> {
@@ -143,4 +150,3 @@ export class UsersController {
       await this.mealsService.updateMeal(mealId, +quantity);
       return updatedOrder;
     } else { */
-

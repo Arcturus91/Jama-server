@@ -3,13 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
+/* import { sendWsp } from 'src/common/utils/twilio'; */
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
-  ) { }
+  ) {}
 
   registerUser(email: string, password: string, type: string) {
     const user = this.userRepo.create({ email, password, type });
@@ -50,6 +51,7 @@ export class UsersService {
       );
     }
     const availableMeals = allMeals.filter((item) => item.isAvailable === true);
+
     return availableMeals;
   }
 

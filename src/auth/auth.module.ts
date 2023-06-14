@@ -1,7 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { AuthController } from './controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/constants/jtw.constants';
+import { jwtConstants } from 'src/constants/constants';
 import { AuthService } from './services/auth.service';
 import { ChefService } from 'src/chef/services/chef.service';
 import { UsersService } from 'src/users/services/users.service';

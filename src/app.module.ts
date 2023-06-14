@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
@@ -10,6 +11,8 @@ import { Order } from './orders/entities/orders.entities';
 import { Chef } from './chef/entities/chef.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { LoggerMiddleware } from './common/utils/logger';
+import { TwilioWhatsappService } from './twilio/twilio.service';
 
 @Module({
   imports: [
@@ -49,6 +52,11 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [TwilioWhatsappService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  //implements is for class-interface implementation
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
