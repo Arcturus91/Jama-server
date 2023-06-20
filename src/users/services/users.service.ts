@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
@@ -12,10 +19,20 @@ export class UsersService {
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
   ) {}
 
-  registerUser(email: string, password: string, type: string) {
+  async registerUser(email: string, password: string, type: string) {
     const user = this.userRepo.create({ email, password, type });
-    if (user) Logger.log('@registerUser - User created successfully');
-    return this.userRepo.save(user);
+    try {
+      if (user) Logger.log('@registerUser - User created successfully');
+      return await this.userRepo.save(user);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new HttpException('User already exists', HttpStatus.CONFLICT);
+      }
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findUsers() {

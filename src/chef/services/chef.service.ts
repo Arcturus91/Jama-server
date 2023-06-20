@@ -17,7 +17,7 @@ export class ChefService {
   constructor(
     @InjectRepository(Chef) private chefRepo: Repository<Chef>,
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
-  ) { }
+  ) {}
 
   registerChef(email: string, password: string, type: string) {
     const chef = this.chefRepo.create({ email, password, type });
@@ -34,7 +34,16 @@ export class ChefService {
 
   async findAllChef() {
     return await this.chefRepo.find({
-      select: ['id', 'email', 'password', 'type'],
+      select: [
+        'id',
+        'email',
+        'type',
+        'bio',
+        'rating',
+        'totalRatings',
+        'address',
+        'profileImageUrl',
+      ],
     });
   }
 
