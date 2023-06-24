@@ -52,7 +52,7 @@ import { TwilioWhatsappService } from './twilio/twilio.service';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [TwilioWhatsappService],
 })
 export class AppModule implements NestModule {
   //implements is for class-interface implementation
