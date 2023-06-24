@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TwilioWhatsappService {
-  private twilioClient: Twilio;
+  /* private twilioClient: Twilio;
   private twilioNumber: string;
   private jamaNumber: string;
   constructor(private configService: ConfigService) {
@@ -27,5 +27,5 @@ export class TwilioWhatsappService {
       .catch((error) => {
         console.error('Error sending sms message:', error);
       });
-  }
+  } */
 }
