@@ -34,7 +34,7 @@ export class UsersController {
     private authService: AuthService,
     private ordersService: OrdersService,
     private mealsService: MealsService,
-  ) { }
+  ) {}
 
   @Post('/auth/signup/user')
   async createUser(
@@ -58,11 +58,14 @@ export class UsersController {
     @Res() res: Response,
   ): Promise<void> {
     const { email, password, type } = body;
-    const { entity, token } = await this.authService.login(email, password, type);
+    const { entity, token } = await this.authService.login(
+      email,
+      password,
+      type,
+    );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
     res.status(200).json(entity);
   }
-
 
   @Get('/availablemeals')
   getAvailableMeals(): Promise<Meal[]> {
@@ -126,7 +129,6 @@ export class UsersController {
     return this.usersService.deleteUser(userid);
   }
 
-
   @Get('/user/:userid')
   @UseGuards(JwtAuthGuard)
   async getUserDetail(@Param('userid') userid: string): Promise<User> {
@@ -143,4 +145,3 @@ export class UsersController {
       await this.mealsService.updateMeal(mealId, +quantity);
       return updatedOrder;
     } else { */
-
