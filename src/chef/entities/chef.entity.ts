@@ -17,6 +17,9 @@ export class Chef {
   @Column({ unique: true })
   email: string;
 
+  @Column({ nullable: true })
+  name: string;
+
   @Column({ select: false })
   password: string;
 

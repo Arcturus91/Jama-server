@@ -25,7 +25,7 @@ export class ChefController {
   constructor(
     private chefService: ChefService,
     private authService: AuthService,
-  ) { }
+  ) {}
 
   @Post('/auth/signup/chef')
   async createChef(
@@ -89,7 +89,6 @@ export class ChefController {
   }
 
   @Get('/chef/:id')
-  @UseGuards(JwtAuthGuard)
   async getChefById(@Param('id') id: string): Promise<Chef> {
     const chef = await this.chefService.findChefById(id);
     return chef;

@@ -13,6 +13,10 @@ export class CreateChefDto {
   @IsString()
   email: string;
 
+  @Length(4, 30)
+  @IsString()
+  name: string;
+
   @IsString()
   @Length(8, 30)
   password: string;

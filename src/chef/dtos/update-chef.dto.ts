@@ -2,6 +2,7 @@
 import {
     IsOptional,
     IsString,
+    Length,
 } from 'class-validator';
 
 export class UpdateChefDto {
@@ -21,5 +22,10 @@ export class UpdateChefDto {
     @IsString()
     @IsOptional()
     bio?: string;
+
+    @Length(4, 30)
+    @IsString()
+    @IsOptional()
+    name: string;
 
 }
