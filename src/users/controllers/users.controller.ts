@@ -73,11 +73,10 @@ export class UsersController {
     return availableMeals;
   }
 
-  //implement Guard: admin
-  @Get('/findusers')
-  @UseGuards(JwtAuthGuard)
-  findUsers(): Promise<User[]> {
-    return this.usersService.findUsers();
+  //!implement Guard: admin
+  @Get('/user/getallusers')
+  getAllUsers(): Promise<User[]> {
+    return this.usersService.getAllUsers();
   }
 
   @Get('/availablemeals/:mealid')
@@ -132,6 +131,13 @@ export class UsersController {
     @Param('userid') userid: string,
   ): Promise<{ message: string }> {
     return this.usersService.deleteUser(userid);
+  }
+
+  @Get('/user/:userid')
+  @UseGuards(JwtAuthGuard)
+  async getUserDetail(@Param('userid') userid: string): Promise<User> {
+    const user = this.usersService.findUserById(userid);
+    return user;
   }
 }
 

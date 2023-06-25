@@ -35,7 +35,7 @@ export class UsersService {
     }
   }
 
-  async findUsers() {
+  async getAllUsers() {
     const allUsers = await this.userRepo.find();
     if (!allUsers) throw new NotFoundException('No hay usuarios registrados');
     return allUsers;
@@ -51,6 +51,15 @@ export class UsersService {
   async findOne(id: string) {
     const user = await this.userRepo.findOne({ where: { id } });
     if (user) Logger.log('@findOne - User found');
+    return user;
+  }
+
+  async findUserById(id: string) {
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: ['orders'],
+    });
+    if (!user) throw new NotFoundException('Usuario no registrado');
     return user;
   }
 
