@@ -27,7 +27,6 @@ import { Response } from 'express';
 import { TwilioWhatsappService } from 'src/twilio/twilio.service';
 
 @Controller()
-@UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
     private usersService: UsersService,
