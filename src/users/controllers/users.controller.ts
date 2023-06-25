@@ -111,6 +111,10 @@ export class UsersController {
     );
 
     await this.mealsService.updateMeal(mealId, +quantity);
+    this.twilioWhatsappService.sendMessages(
+      newOrder.user.id,
+      newOrder.meal.name,
+    );
     return newOrder;
     //session.orderId = newOrder.id;
     //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
