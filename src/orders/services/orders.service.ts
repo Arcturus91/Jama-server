@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { Repository } from 'typeorm';
@@ -10,7 +14,7 @@ export class OrdersService {
   constructor(
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
     @InjectRepository(Order) private orderRepo: Repository<Order>,
-  ) { }
+  ) {}
 
   async updateOrder(
     mealId: string,
@@ -58,7 +62,12 @@ export class OrdersService {
     }
   }
 
-
+  async getAllOrders(): Promise<Order[]> {
+    const allOrders = await this.orderRepo.find({
+      relations: ['user', 'meal'],
+    });
+    return allOrders;
+  }
 }
 
 /*   async addMealToOrder(

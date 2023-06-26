@@ -1,11 +1,19 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from '../entities/meal.entity';
 import { Repository } from 'typeorm';
+import { Chef } from 'src/chef/entities/chef.entity';
 
 @Injectable()
 export class MealsService {
-  constructor(@InjectRepository(Meal) private mealRepo: Repository<Meal>) { }
+  constructor(@InjectRepository(Meal) private mealRepo: Repository<Meal>) {}
 
   async validateMealRequest(
     mealId: string,
@@ -44,7 +52,33 @@ export class MealsService {
     try {
       await this.mealRepo.update(mealId, dataToUpdate);
     } catch (e) {
-      throw new InternalServerErrorException('Error updating meal', e.message);
+      throw new InternalServerErrorException(
+        'Error al actualizar el platillo',
+        e.message,
+      );
+    }
+  }
+
+  async deleteMeal(mealId: string, chef: Chef): Promise<void> {
+    const mealToDelete = await this.mealRepo.findOne({ where: { id: mealId } });
+
+    if (!mealToDelete) {
+      throw new NotFoundException({ message: 'No se encontró el platillo' });
+    } else {
+      if (mealToDelete.chef !== chef) {
+        throw new HttpException(
+          'No estás autorizado para borrar este platillo',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      try {
+        await this.mealRepo.delete(mealToDelete.id);
+      } catch (e) {
+        throw new InternalServerErrorException(
+          'Error deleting meal',
+          e.message,
+        );
+      }
     }
   }
 }

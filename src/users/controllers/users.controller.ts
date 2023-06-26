@@ -68,7 +68,7 @@ export class UsersController {
   }
 
   @Get('/availablemeals')
-  getAvailableMeals(user: User): Promise<Meal[]> {
+  getAvailableMeals(): Promise<Meal[]> {
     const availableMeals = this.usersService.getAvailableMeals();
     return availableMeals;
   }
