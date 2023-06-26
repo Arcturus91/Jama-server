@@ -60,12 +60,14 @@ export class MealsService {
   }
 
   async deleteMeal(mealId: string, chef: Chef): Promise<void> {
-    const mealToDelete = await this.mealRepo.findOne({ where: { id: mealId } });
-
+    const mealToDelete = await this.mealRepo.findOne({
+      where: { id: mealId },
+      relations: ['chef'],
+    });
     if (!mealToDelete) {
       throw new NotFoundException({ message: 'No se encontró el platillo' });
     } else {
-      if (mealToDelete.chef !== chef) {
+      if (mealToDelete.chef.id !== chef.id) {
         throw new HttpException(
           'No estás autorizado para borrar este platillo',
           HttpStatus.UNAUTHORIZED,
