@@ -76,6 +76,8 @@ export class MealsService {
       try {
         await this.mealRepo.delete(mealToDelete.id);
       } catch (e) {
+        //!add handler for typeorm constraint delete error.
+        //!it has to be shown to chef.
         throw new InternalServerErrorException(
           'Error deleting meal',
           e.message,
