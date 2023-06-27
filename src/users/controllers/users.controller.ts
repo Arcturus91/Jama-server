@@ -143,11 +143,14 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async getUserDetail(@Param('userid') userid: string): Promise<User> {
     const user = await this.usersService.findUserById(userid);
-    const lastOrderId = user.orders[user.orders.length - 1].id;
-    const getLastUserOrder = await this.ordersService.userLastOrder(
-      lastOrderId,
-    );
-    user.orders[user.orders.length - 1] = getLastUserOrder;
+    if (user.orders.length > 0) {
+      const lastOrderId = user.orders[user.orders.length - 1].id;
+      const getLastUserOrder = await this.ordersService.userLastOrder(
+        lastOrderId,
+      );
+      user.orders[user.orders.length - 1] = getLastUserOrder;
+      return user;
+    }
     return user;
   }
 
