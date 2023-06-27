@@ -26,6 +26,7 @@ import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { Response } from 'express';
 import { TwilioWhatsappService } from 'src/twilio/twilio.service';
 import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
+import { LogInUserDto } from '../dtos/login-user.dto';
 
 @Controller()
 export class UsersController {
@@ -63,10 +64,7 @@ export class UsersController {
   }
 
   @Post('/auth/login/user')
-  async login(
-    @Body() body: SignInUserDto,
-    @Res() res: Response,
-  ): Promise<void> {
+  async login(@Body() body: LogInUserDto, @Res() res: Response): Promise<void> {
     const { email, password, type } = body;
     const { entity, token } = await this.authService.login(
       email,
@@ -117,12 +115,9 @@ export class UsersController {
       mealId,
       +quantity,
     );
-
+    console.log('new order', newOrder, user);
     await this.mealsService.updateMeal(mealId, +quantity);
-    this.twilioWhatsappService.sendMessages(
-      newOrder.user.id,
-      newOrder.meal.name,
-    );
+    this.twilioWhatsappService.sendMessages(user.id, newOrder.meal.name);
     console.log('NEW ORDER', newOrder);
     return newOrder;
     //session.orderId = newOrder.id;
@@ -147,8 +142,22 @@ export class UsersController {
   @Get('/user/:userid')
   @UseGuards(JwtAuthGuard)
   async getUserDetail(@Param('userid') userid: string): Promise<User> {
-    const user = this.usersService.findUserById(userid);
+    const user = await this.usersService.findUserById(userid);
+    const lastOrderId = user.orders[user.orders.length - 1].id;
+    const getLastUserOrder = await this.ordersService.userLastOrder(
+      lastOrderId,
+    );
+    user.orders[user.orders.length - 1] = getLastUserOrder;
     return user;
+  }
+
+  @Get('/user/lastorder/:userid')
+  @UseGuards(JwtAuthGuard)
+  async getLastUserOrder(@Param('userid') userid: string) {
+    const user = await this.usersService.findUserById(userid);
+    const lastOrderId = user.orders[user.orders.length - 1].id;
+    const getLastUserOrder = this.ordersService.userLastOrder(lastOrderId);
+    return getLastUserOrder;
   }
 
   //necesito una ruta  de admin para definir un pedido como requested / onPreparation / ReadyToDeliver / Delivered

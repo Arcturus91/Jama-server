@@ -74,6 +74,13 @@ export class OrdersService {
     });
     return allOrders;
   }
+
+  async userLastOrder(orderId: string): Promise<Order> {
+    return await this.orderRepo.findOne({
+      where: { id: orderId },
+      relations: ['meal'],
+    });
+  }
 }
 
 /*   async addMealToOrder(

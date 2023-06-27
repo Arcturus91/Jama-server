@@ -77,7 +77,6 @@ export class UsersService {
 
   async getAvailableMeals() {
     //TODO:Código para encontrar las comidas cercanas al usuario en base a su dirección.
-    //!not found exception tira un error 404, por cierto.
     const allMeals = await this.mealRepo.find();
     if (allMeals.length === 0) {
       Logger.warn('@getAvailableMeals - No meals available at the moment');
@@ -98,7 +97,7 @@ export class UsersService {
     return selectedMeal;
   }
 
-  //!Route: delete/ban user : needs modification in entity.
+  //!Route: delete/ban user : needs modification in entity because of constrains
 
   async deleteUser(id: string) {
     const user = await this.userRepo.findOne({ where: { id } });
