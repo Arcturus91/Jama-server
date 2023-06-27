@@ -20,4 +20,7 @@ export class SignInChefDto {
 
   @IsEnum(UserType)
   type: string;
+
+  @IsString()
+  address: string;
 }

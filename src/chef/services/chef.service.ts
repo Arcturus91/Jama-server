@@ -19,8 +19,20 @@ export class ChefService {
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
   ) {}
 
-  registerChef(email: string, password: string, type: string) {
-    const chef = this.chefRepo.create({ email, password, type });
+  registerChef(
+    email: string,
+    password: string,
+    type: string,
+    address: string,
+    phoneNumber: string,
+  ) {
+    const chef = this.chefRepo.create({
+      email,
+      password,
+      type,
+      address,
+      phoneNumber,
+    });
     if (chef) Logger.log('@registerChef - Chef registered');
     return this.chefRepo.save(chef);
   }

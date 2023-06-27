@@ -17,7 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private chefService: ChefService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async hashPassword(password: string): Promise<string> {
     const saltOrRounds = 10;
@@ -31,7 +31,7 @@ export class AuthService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  async signup(email, password, type): Promise<any> {
+  async signup(email, password, type, address, phoneNumber): Promise<any> {
     let entity: User | Chef;
     const hashedPassword = await this.hashPassword(password);
     if (type === UserType.USER) {
@@ -39,6 +39,8 @@ export class AuthService {
         email,
         hashedPassword,
         type,
+        address,
+        phoneNumber,
       );
       entity = user;
     } else if (type === UserType.CHEF) {
@@ -46,6 +48,8 @@ export class AuthService {
         email,
         hashedPassword,
         type,
+        address,
+        phoneNumber,
       );
       entity = chef;
     }

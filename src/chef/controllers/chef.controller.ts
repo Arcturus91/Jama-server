@@ -7,6 +7,8 @@ import {
   Get,
   Param,
   Put,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ChefService } from '../services/chef.service';
 import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
@@ -19,6 +21,7 @@ import { Response } from 'express';
 import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { CurrentChef } from '../decorators/current-chef.decorator';
 import { UpdateChefDto } from '../dtos/update-chef.dto';
+import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 
 @Controller()
 export class ChefController {
@@ -32,11 +35,21 @@ export class ChefController {
     @Body() body: CreateChefDto,
     @Res() res: Response,
   ): Promise<void> {
-    const { email, password, type } = body;
+    const { email, password, type, address, phoneNumber } = body;
+
+    if (!validatePhoneNumber(phoneNumber)) {
+      throw new HttpException(
+        'El número de teléfono ingresado parece incorrecto',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const { entity, token } = await this.authService.signup(
       email,
       password,
       type,
+      address,
+      phoneNumber,
     );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
     res.status(200).json(entity);

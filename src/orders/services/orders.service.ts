@@ -8,6 +8,7 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { Repository } from 'typeorm';
 import { Order } from '../entities/orders.entities';
 import { User } from 'src/users/entities/user.entity';
+import { OrderStatus } from 'src/constants/constants';
 
 @Injectable()
 export class OrdersService {
@@ -39,14 +40,16 @@ export class OrdersService {
     quantity: number,
   ): Promise<Order> {
     const orderedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
-    // And thats why you need to do the findOne method: to get udpated status of meal.
-    //!to create an order or update an order should trigger some alert/message to chef and admin.
     if (!orderedMeal) {
       throw new BadRequestException('plato no encontrado');
     }
 
+    if (orderedMeal.availableAmount < 1) {
+      throw new BadRequestException('Platillo ya no disponible');
+    }
+
     const totalPrice = orderedMeal.price * quantity;
-    const orderStatus = 'onSelection';
+    const orderStatus = OrderStatus.requested;
     const newOrder = this.orderRepo.create({
       totalPrice,
       user,
@@ -55,8 +58,11 @@ export class OrdersService {
     });
     try {
       const savedOrder = await this.orderRepo.save(newOrder);
-      console.log('meal added to order', savedOrder);
-      return savedOrder;
+      const completeOrder = await this.orderRepo.findOne({
+        where: { id: savedOrder.id },
+        relations: ['meal'],
+      });
+      return completeOrder;
     } catch (e) {
       throw new InternalServerErrorException('Error creating order', e.message);
     }

@@ -20,4 +20,7 @@ export class SignInUserDto {
 
   @IsEnum(UserType)
   type: string;
+
+  @IsString()
+  address: string;
 }

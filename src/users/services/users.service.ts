@@ -19,8 +19,20 @@ export class UsersService {
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
   ) {}
 
-  async registerUser(email: string, password: string, type: string) {
-    const user = this.userRepo.create({ email, password, type });
+  async registerUser(
+    email: string,
+    password: string,
+    type: string,
+    address: string,
+    phoneNumber: string,
+  ) {
+    const user = this.userRepo.create({
+      email,
+      password,
+      type,
+      address,
+      phoneNumber,
+    });
     try {
       if (user) Logger.log('@registerUser - User created successfully');
       return await this.userRepo.save(user);

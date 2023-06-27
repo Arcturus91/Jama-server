@@ -15,9 +15,11 @@ export class CreateUserDto {
   profileImageUrl: string;
 
   @IsString()
-  @IsOptional()
   phoneNumber: string;
 
   @IsEnum(UserType)
   type;
+
+  @IsString()
+  address: string;
 }

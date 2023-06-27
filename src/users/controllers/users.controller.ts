@@ -25,6 +25,7 @@ import { MealsService } from 'src/meals/services/meals.service';
 import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { Response } from 'express';
 import { TwilioWhatsappService } from 'src/twilio/twilio.service';
+import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 
 @Controller()
 export class UsersController {
@@ -41,11 +42,20 @@ export class UsersController {
     @Body() body: CreateUserDto,
     @Res() res: Response,
   ): Promise<void> {
-    const { email, password, type } = body;
+    const { email, password, type, address, phoneNumber } = body;
+    if (!validatePhoneNumber(phoneNumber)) {
+      throw new HttpException(
+        'El número de teléfono ingresado parece incorrecto',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const { entity, token } = await this.authService.signup(
       email,
       password,
       type,
+      address,
+      phoneNumber,
     );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
 
@@ -113,6 +123,7 @@ export class UsersController {
       newOrder.user.id,
       newOrder.meal.name,
     );
+    console.log('NEW ORDER', newOrder);
     return newOrder;
     //session.orderId = newOrder.id;
     //!eventually, we will implement addMealToOrder(). But need to change Order entity relation with meals to Many to Many.
@@ -139,6 +150,8 @@ export class UsersController {
     const user = this.usersService.findUserById(userid);
     return user;
   }
+
+  //necesito una ruta  de admin para definir un pedido como requested / onPreparation / ReadyToDeliver / Delivered
 }
 
 /*     if (session.orderId) {

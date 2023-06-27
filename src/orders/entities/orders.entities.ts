@@ -28,7 +28,7 @@ export class Order {
   user: User;
 
   @Column()
-  orderStatus: string; // onSelection, required, onCooking, onDelivery, completed
+  orderStatus: string; //! eventually implement enum for the following values requested, onCooking, onDelivery, completed
 
   //many orders can have one single meal.
   //each order can contain one single meal, otherwise many to many would be necessary
