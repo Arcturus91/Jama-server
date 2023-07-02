@@ -32,6 +32,7 @@ export class AuthService {
   }
 
   async signup(email, password, type, address, phoneNumber): Promise<any> {
+    phoneNumber = '+51' + phoneNumber;
     let entity: User | Chef;
     const hashedPassword = await this.hashPassword(password);
     if (type === UserType.USER) {

@@ -11,14 +11,14 @@ import { ChefService } from 'src/chef/services/chef.service';
 import { Chef } from 'src/chef/entities/chef.entity';
 import { OrdersService } from 'src/orders/services/orders.service';
 import { MealsService } from 'src/meals/services/meals.service';
-import { TwilioWhatsappService } from 'src/twilio/twilio.service';
+import { TwilioMessagingService } from 'src/twilio/twilio.service';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Order, Meal, Chef])],
   controllers: [UsersController],
   providers: [
-    TwilioWhatsappService,
+    TwilioMessagingService,
     ConfigService,
     UsersService,
     AuthService,

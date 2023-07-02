@@ -18,13 +18,12 @@ import { User } from '../entities/user.entity';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
-import { SignInUserDto } from '../dtos/signin-user.dto';
 import { OrdersService } from 'src/orders/services/orders.service';
 import { Order } from 'src/orders/entities/orders.entities';
 import { MealsService } from 'src/meals/services/meals.service';
 import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { Response } from 'express';
-import { TwilioWhatsappService } from 'src/twilio/twilio.service';
+import { TwilioMessagingService } from 'src/twilio/twilio.service';
 import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 import { LogInUserDto } from '../dtos/login-user.dto';
 
@@ -35,7 +34,7 @@ export class UsersController {
     private authService: AuthService,
     private ordersService: OrdersService,
     private mealsService: MealsService,
-    private twilioWhatsappService: TwilioWhatsappService,
+    private twilioMessagingService: TwilioMessagingService,
   ) {}
 
   @Post('/auth/signup/user')
@@ -115,9 +114,16 @@ export class UsersController {
       mealId,
       +quantity,
     );
-    console.log('new order', newOrder, user);
+
+    const { phoneNumber } = await this.usersService.findUserById(user.id);
+
+    console.log('new order', newOrder, user, phoneNumber);
     await this.mealsService.updateMeal(mealId, +quantity);
-    this.twilioWhatsappService.sendMessages(user.id, newOrder.meal.name);
+    this.twilioMessagingService.sendSMS(
+      user.id,
+      newOrder.meal.name,
+      phoneNumber,
+    );
     console.log('NEW ORDER', newOrder);
     return newOrder;
     //session.orderId = newOrder.id;

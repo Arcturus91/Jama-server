@@ -12,7 +12,7 @@ import { Chef } from './chef/entities/chef.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerMiddleware } from './common/utils/logger';
-import { TwilioWhatsappService } from './twilio/twilio.service';
+import { TwilioMessagingService } from './twilio/twilio.service';
 
 @Module({
   imports: [
@@ -52,7 +52,7 @@ import { TwilioWhatsappService } from './twilio/twilio.service';
     AuthModule,
   ],
   controllers: [],
-  providers: [TwilioWhatsappService],
+  providers: [TwilioMessagingService],
 })
 export class AppModule implements NestModule {
   //implements is for class-interface implementation

@@ -26,24 +26,14 @@ export class CreateChefDto {
   profileImageUrl?: string;
 
   @IsString()
-  @IsOptional()
-  phoneNumber?: string;
+  phoneNumber: string;
 
   @IsString()
-  @IsOptional()
-  address?: string;
+  address: string;
 
   @IsString()
   @IsOptional()
   bio?: string;
-
-  @IsNumber()
-  @IsOptional()
-  rating?: number;
-
-  @IsNumber()
-  @IsOptional()
-  totalRatings?: number;
 
   @IsEnum(UserType)
   type: UserType;

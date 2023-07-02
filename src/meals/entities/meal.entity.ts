@@ -24,24 +24,24 @@ export class Meal {
   @Column('float')
   price: number;
 
-  @Column('integer')
+  @Column({ type: 'integer', name: 'available_amount' })
   availableAmount: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'image_url' })
   imageUrl: string;
 
-  @Column({ default: true })
+  @Column({ default: true, name: 'is_available' })
   isAvailable: boolean;
 
-  //agregar valoración de comida
+  //!agregar valoración de comida
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'meal_status' })
   mealStatus: string; //cooking, readyToBePickedUp
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   //many meals have one single chef

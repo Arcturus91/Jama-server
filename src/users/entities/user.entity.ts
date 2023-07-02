@@ -20,16 +20,16 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'profile_image_url' })
   profileImageUrl: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'phone_number' })
   phoneNumber: string;
-
-  @CreateDateColumn()
+  //!remove all nullable true de los elementos que no pueden ser nullable como el phonenumber
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @Column({ default: '' })

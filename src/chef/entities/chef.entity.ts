@@ -23,16 +23,16 @@ export class Chef {
   @Column({ select: false })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'profile_image_url' })
   profileImageUrl: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'phone_number' })
   phoneNumber: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @Column({ nullable: true })
@@ -41,7 +41,7 @@ export class Chef {
   @Column('float', { default: 0, nullable: true })
   rating: number;
 
-  @Column({ default: 0, nullable: true })
+  @Column({ default: 0, nullable: true, name: 'total_ratings' })
   totalRatings: number;
 
   @Column({ default: '' })

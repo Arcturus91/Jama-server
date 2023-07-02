@@ -14,13 +14,13 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('float')
+  @Column({ type: 'float', name: 'total_price' })
   totalPrice: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   //many orders to one user
