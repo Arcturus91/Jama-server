@@ -84,7 +84,7 @@ export class ChefService {
       );
     }
     if (!meal) {
-      throw new NotFoundException(`Plato #${id} not encontrada`);
+      throw new NotFoundException(`Plato #${id} no encontrada`);
     }
 
     meal = { ...meal, ...mealUpdates };

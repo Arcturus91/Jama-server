@@ -9,11 +9,12 @@ export class UpdateChefDto {
 
     @IsString()
     @IsOptional()
-    profileImageUrl?: string;
+    profileImageUrl: string;
 
     @IsString()
     @IsOptional()
-    phoneNumber?: string;
+    @Length(9, 9)
+    phoneNumber: string;
 
     @IsString()
     @IsOptional()
@@ -21,7 +22,7 @@ export class UpdateChefDto {
 
     @IsString()
     @IsOptional()
-    bio?: string;
+    bio: string;
 
     @Length(4, 30)
     @IsString()

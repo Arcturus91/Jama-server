@@ -10,6 +10,8 @@ import {
   Delete,
   HttpStatus,
   HttpException,
+  Put,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -26,6 +28,7 @@ import { Response } from 'express';
 import { TwilioMessagingService } from 'src/twilio/twilio.service';
 import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 import { LogInUserDto } from '../dtos/login-user.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
 
 @Controller()
 export class UsersController {
@@ -169,6 +172,27 @@ export class UsersController {
     return getLastUserOrder;
   }
 
+  //! Route for user update
+
+  @Patch('/user/updateuser/:userid')
+  @UseGuards(JwtAuthGuard)
+  async updateUser(
+    @Param('userid') userid: string,
+    @CurrentUser() user: User,
+    @Body() body: UpdateUserDto,
+  ): Promise<User> {
+    if (body.phoneNumber.length === 9) {
+      if (!validatePhoneNumber(body.phoneNumber)) {
+        throw new HttpException(
+          'El número de teléfono ingresado parece incorrecto',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      body.phoneNumber = '+51' + body.phoneNumber;
+    }
+    const updatedUser = await this.usersService.updateUser(userid, user, body);
+    return updatedUser;
+  }
   //necesito una ruta  de admin para definir un pedido como requested / onPreparation / ReadyToDeliver / Delivered
 }
 

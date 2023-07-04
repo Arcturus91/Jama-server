@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
+import { UpdateUserDto } from '../dtos/update-user.dto';
 /* import { sendWsp } from 'src/common/utils/twilio'; */
 
 @Injectable()
@@ -106,5 +107,31 @@ export class UsersService {
     }
     await this.userRepo.delete(id);
     return { message: 'User successfully deleted.' };
+  }
+
+  async updateUser(
+    id: User['id'],
+    user: User,
+    updateUser: UpdateUserDto,
+  ): Promise<User> {
+    const prevUserData = await this.userRepo.findOne({ where: { id } });
+
+    if (!prevUserData) {
+      throw new NotFoundException(`Usuario #${id} no encontrado`);
+    }
+
+    if (user.id !== prevUserData.id) {
+      throw new HttpException(
+        ' No estás permitido de modificar otro usuario',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const { ...userUpdates } = updateUser;
+    const updatedUser = { ...prevUserData, ...userUpdates };
+
+    if (updatedUser) Logger.log('@updateUser - user updated');
+
+    return this.userRepo.save(updatedUser);
   }
 }

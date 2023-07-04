@@ -9,6 +9,7 @@ import {
   Put,
   HttpException,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { ChefService } from '../services/chef.service';
 import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
@@ -81,7 +82,7 @@ export class ChefController {
     return meal;
   }
 
-  @Put('/chef/updatemeal/:id')
+  @Patch('/chef/updatemeal/:id')
   @UseGuards(JwtAuthGuard)
   async updateMeal(
     @CurrentChef() chef: Chef,
@@ -105,7 +106,7 @@ export class ChefController {
     return chef;
   }
 
-  @Put('/chef/updatechef/:id')
+  @Patch('/chef/updatechef/:id')
   @UseGuards(JwtAuthGuard)
   async updateChefInfo(
     @CurrentChef() chef: Chef,
