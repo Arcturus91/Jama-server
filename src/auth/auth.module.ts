@@ -11,6 +11,8 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { Order } from 'src/orders/entities/orders.entities';
 import { JwtStrategy } from './jwt.strategy';
 import { ConfigService } from '@nestjs/config';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [

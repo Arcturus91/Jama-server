@@ -28,6 +28,7 @@ import { TwilioMessagingService } from 'src/twilio/twilio.service';
 import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 import { LogInUserDto } from '../dtos/login-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
+import { CurrentAdmin } from '../decorators/current-admin.decorator';
 
 @Controller()
 export class UsersController {
@@ -190,15 +191,12 @@ export class UsersController {
     const updatedUser = await this.usersService.updateUser(userid, user, body);
     return updatedUser;
   }
-  //necesito una ruta  de admin para definir un pedido como requested / onPreparation / ReadyToDeliver / Delivered
-}
 
-/*     if (session.orderId) {
-      const updatedOrder = await this.ordersService.updateOrder(
-        mealId,
-        +quantity,
-        session.orderId,
-      );
-      await this.mealsService.updateMeal(mealId, +quantity);
-      return updatedOrder;
-    } else { */
+  //necesito una ruta  de admin para definir un pedido como requested / onPreparation / ReadyToDeliver / Delivered
+  //<-- Admin Routes -->
+  @Get('/admin/updatemeal/allpendingmeals')
+  @UseGuards(JwtAuthGuard)
+  async updateMealStatus(@CurrentAdmin() admin: User) {
+    console.log(admin);
+  }
+}

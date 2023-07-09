@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -34,6 +36,9 @@ export class JwtAuthGuard implements CanActivate {
       } else if (type === 'chef') {
         request['chef'] = { id, type };
         Logger.log('chef data from jwt', request.chef);
+      } else if (type === 'admin') {
+        request['admin'] = { id, type };
+        Logger.log('AdminData', request.chef);
       }
     } catch {
       throw new UnauthorizedException();
