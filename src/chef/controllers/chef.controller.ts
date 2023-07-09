@@ -12,7 +12,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import { ChefService } from '../services/chef.service';
-import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
+import { CreateMealDto } from 'src/meals/dtos/create-meal.dto';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { CreateChefDto } from '../dtos/create-chef.dto';
 import { AuthService } from 'src/auth/services/auth.service';
@@ -24,6 +24,7 @@ import { CurrentChef } from '../decorators/current-chef.decorator';
 import { UpdateChefDto } from '../dtos/update-chef.dto';
 import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 import { LogInChefDto } from '../dtos/login-chef.dto copy';
+import { UpdateMealDto } from 'src/meals/dtos/update-meal.dto';
 
 @Controller()
 export class ChefController {
@@ -75,7 +76,7 @@ export class ChefController {
   @UseGuards(JwtAuthGuard)
   async createMeal(
     @CurrentChef() chef: Chef,
-    @Body() body: any,
+    @Body() body: CreateMealDto,
   ): Promise<Meal> {
     console.log('body', body);
     const meal = await this.chefService.createMeal(body, chef);

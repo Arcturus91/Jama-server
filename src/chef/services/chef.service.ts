@@ -9,8 +9,9 @@ import { Chef } from '../entities/chef.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { CreateMealDto, UpdateMealDto } from 'src/meals/dtos/create-meal.dto';
+import { CreateMealDto } from 'src/meals/dtos/create-meal.dto';
 import { UpdateChefDto } from '../dtos/update-chef.dto';
+import { UpdateMealDto } from 'src/meals/dtos/update-meal.dto';
 
 @Injectable()
 export class ChefService {

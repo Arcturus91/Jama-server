@@ -8,9 +8,8 @@ export class LoggerMiddleware implements NestMiddleware {
         const { method, originalUrl } = req;
         res.on('finish', () => {
             const { statusCode } = res;
-            const contentLength = res.get('content-length');
             this.logger.log(
-                `${method} ${originalUrl} ${statusCode} ${contentLength}`,
+                `${method} ${originalUrl} ${statusCode}`,
             );
         });
         next();

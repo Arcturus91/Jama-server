@@ -34,7 +34,7 @@ export class Meal {
   isAvailable: boolean;
 
   //!agregar valoración de comida
-
+  //todo: creo que mealStatus debería ser orderStatus
   @Column({ nullable: true, name: 'meal_status' })
   mealStatus: string; //cooking, readyToBePickedUp
 
