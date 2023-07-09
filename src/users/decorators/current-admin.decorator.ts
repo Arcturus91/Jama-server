@@ -9,7 +9,7 @@ export const CurrentAdmin = createParamDecorator(
     const request = context.switchToHttp().getRequest();
     if (!request.admin) {
       throw new UnauthorizedException(
-        'Debes estar registrado como user para revisar la siguiente ruta.',
+        'Debes estar registrado como administrador para revisar la siguiente ruta.',
       );
     }
     return request.admin;

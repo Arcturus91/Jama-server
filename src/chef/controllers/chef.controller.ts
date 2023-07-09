@@ -23,7 +23,7 @@ import { JwtAuthGuard } from 'src/guards/jtw-auth.guard';
 import { CurrentChef } from '../decorators/current-chef.decorator';
 import { UpdateChefDto } from '../dtos/update-chef.dto';
 import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
-import { LogInChefDto } from '../dtos/login-chef.dto copy';
+import { LogInChefDto } from '../dtos/login-chef.dto';
 import { UpdateMealDto } from 'src/meals/dtos/update-meal.dto';
 
 @Controller()
@@ -61,9 +61,18 @@ export class ChefController {
   @Post('/auth/login/chef')
   async login(@Body() body: LogInChefDto, @Res() res: Response): Promise<void> {
     const { email, password, type } = body;
-    const { chef, token } = await this.authService.login(email, password, type);
+    if (type === 'user')
+      throw new HttpException(
+        'No puedes logearte como chef, Usuario',
+        HttpStatus.UNAUTHORIZED,
+      );
+    const { entity, token } = await this.authService.login(
+      email,
+      password,
+      type,
+    );
     res.setHeader('Set-Cookie', this.authService.getCookieWithJwtToken(token));
-    res.status(200).json(chef);
+    res.status(200).json(entity);
   }
 
   @Get('/chef/getallchef')

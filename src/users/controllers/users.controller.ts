@@ -29,6 +29,7 @@ import { validatePhoneNumber } from 'src/common/utils/validatePhoneNumber';
 import { LogInUserDto } from '../dtos/login-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { CurrentAdmin } from '../decorators/current-admin.decorator';
+import { OrderStatus } from 'src/constants/constants';
 
 @Controller()
 export class UsersController {
@@ -68,6 +69,11 @@ export class UsersController {
   @Post('/auth/login/user')
   async login(@Body() body: LogInUserDto, @Res() res: Response): Promise<void> {
     const { email, password, type } = body;
+    if (type === 'chef')
+      throw new HttpException(
+        'No puedes logearte como usuario, Chef',
+        HttpStatus.UNAUTHORIZED,
+      );
     const { entity, token } = await this.authService.login(
       email,
       password,
@@ -196,7 +202,27 @@ export class UsersController {
   //<-- Admin Routes -->
   @Get('/admin/updatemeal/allpendingmeals')
   @UseGuards(JwtAuthGuard)
-  async updateMealStatus(@CurrentAdmin() admin: User) {
+  async getAllRequestedMeals(@CurrentAdmin() admin: User) {
+    OrderStatus.requested;
     console.log(admin);
+    // retrieves all meals with status requested
+    // show their user, meal, price
   }
+
+  /* @Patch()
+  async updateMealStatus(){
+    -encuentra el meal y lo actualiza para ser:
+    OrderStatus.onCooking
+    OrderStatus.onDelivery
+    OrderStatus.completed
+    al mismo tiempo que envía un mensaje SMS probablemente al chef, definitivamente al user.
+
+    en el front, el admin tiene una pantalla donde sel listan todas las comidas y le puedes cambiar de status sergún una lista desplegable.
+  }
+  */
+
+  /* @Patch()
+  update puntaje de chef, jalando a través de meal, al chef y pudiendo otorgarle una puntuación
+  En el front, una vez que la orden esté en completed, le metes un coinditional rendering para mostrar el botón para calificar
+  */
 }

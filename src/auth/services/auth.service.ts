@@ -64,15 +64,22 @@ export class AuthService {
       const [user] = await this.usersService.findUser(email);
       if (!user) throw new NotFoundException('User not found');
       const isUser = await this.comparePasswords(password, user.password);
-      if (!isUser) throw new BadRequestException('bad password');
+      if (!isUser) throw new BadRequestException('Contraseña incorrecta');
       entity = user;
     } else if (type === UserType.CHEF) {
       const [chef] = await this.chefService.findChef(email);
       if (!chef) throw new NotFoundException('Chef not found');
       const isChef = await this.comparePasswords(password, chef.password);
-      if (!isChef) throw new BadRequestException('bad password');
+      if (!isChef) throw new BadRequestException('Contraseña incorrecta');
       entity = chef;
+    } else if (type === UserType.ADMIN) {
+      const [admin] = await this.usersService.findUser(email);
+      if (!admin) throw new NotFoundException('Admin no encontrado');
+      const isAdmin = await this.comparePasswords(password, admin.password);
+      if (!isAdmin) throw new BadRequestException('Contraseña incorrecta');
+      entity = admin;
     }
+
     const data = await this.dataJwtSignedGenerator(entity);
     return data;
   }
