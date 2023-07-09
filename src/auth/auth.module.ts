@@ -1,7 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
 import { AuthController } from './controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/constants/constants';
 import { AuthService } from './services/auth.service';
 import { ChefService } from 'src/chef/services/chef.service';
 import { UsersService } from 'src/users/services/users.service';
@@ -11,17 +10,25 @@ import { Chef } from 'src/chef/entities/chef.entity';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { Order } from 'src/orders/entities/orders.entities';
 import { JwtStrategy } from './jwt.strategy';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Chef, Meal, Order]),
     JwtModule.register({
       global: true,
-      secret: jwtConstants.secret,
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '20h' },
     }),
   ],
-  providers: [ChefService, AuthService, UsersService, JwtStrategy, Logger],
+  providers: [
+    ChefService,
+    AuthService,
+    UsersService,
+    JwtStrategy,
+    Logger,
+    ConfigService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

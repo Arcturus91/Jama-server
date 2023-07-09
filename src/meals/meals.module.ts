@@ -8,10 +8,18 @@ import { User } from 'src/users/entities/user.entity';
 import { AuthService } from 'src/auth/services/auth.service';
 import { UsersService } from 'src/users/services/users.service';
 import { ChefService } from 'src/chef/services/chef.service';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Meal, Chef, User])],
   controllers: [MealsController],
-  providers: [MealsService, AuthService, UsersService, ChefService, Logger],
+  providers: [
+    MealsService,
+    AuthService,
+    UsersService,
+    ChefService,
+    Logger,
+    ConfigService,
+  ],
 })
 export class MealsModule {}

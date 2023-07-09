@@ -10,7 +10,6 @@ import {
   Delete,
   HttpStatus,
   HttpException,
-  Put,
   Patch,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
@@ -171,8 +170,6 @@ export class UsersController {
     const getLastUserOrder = this.ordersService.userLastOrder(lastOrderId);
     return getLastUserOrder;
   }
-
-  //! Route for user update
 
   @Patch('/user/updateuser/:userid')
   @UseGuards(JwtAuthGuard)

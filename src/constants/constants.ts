@@ -4,10 +4,6 @@ export enum UserType {
   ADMIN = 'admin',
 }
 
-export const jwtConstants = {
-  secret: 'gato',
-};
-
 export enum OrderStatus {
   requested = 'requested',
   onCooking = 'onCooking',
