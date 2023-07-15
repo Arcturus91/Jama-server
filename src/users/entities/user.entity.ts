@@ -37,6 +37,15 @@ export class User {
 
   @Column()
   type: string;
+  //!Aqui se puede colocar un enum pero meterse con la DB ya desplegada es migraciones. Para luego.
+  /* Idealmente:
+  @Column({
+    type:'enum',
+    enum: UserType
+    default: UserType.User,
+    nullable:false,
+    name:type
+  }) */
 
   //one single user can have several orders
   @OneToMany(() => Order, (order) => order.user)

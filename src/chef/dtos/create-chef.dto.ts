@@ -1,12 +1,5 @@
-import {
-  IsEmail,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
-import { UserType } from 'src/constants/constants';
+import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { ChefType } from 'src/constants/constants';
 
 export class CreateChefDto {
   @IsEmail()
@@ -35,6 +28,7 @@ export class CreateChefDto {
   @IsOptional()
   bio?: string;
 
-  @IsEnum(UserType)
-  type: UserType;
+  @IsEnum(ChefType)
+  @IsString()
+  type: string;
 }

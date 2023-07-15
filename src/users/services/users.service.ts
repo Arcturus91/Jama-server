@@ -11,6 +11,8 @@ import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { UpdateUserDto } from '../dtos/update-user.dto';
+import { Order } from 'src/orders/entities/orders.entities';
+import { OrderStatus } from 'src/constants/constants';
 /* import { sendWsp } from 'src/common/utils/twilio'; */
 
 @Injectable()
@@ -18,6 +20,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
+    @InjectRepository(Order) private orderRepo: Repository<Order>,
   ) {}
 
   async registerUser(
@@ -133,5 +136,18 @@ export class UsersService {
     if (updatedUser) Logger.log('@updateUser - user updated');
 
     return this.userRepo.save(updatedUser);
+  }
+
+  async getAllPendingOrders(admin: User): Promise<Order[]> {
+    if (admin.type !== 'admin') {
+      throw new HttpException(
+        'Solo un administrador puede ver esta información',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    return this.orderRepo.find({
+      where: { orderStatus: OrderStatus.requested },
+      relations: ['meal', 'user'],
+    });
   }
 }

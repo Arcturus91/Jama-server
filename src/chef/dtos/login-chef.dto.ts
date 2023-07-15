@@ -1,5 +1,5 @@
-import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { UserType } from 'src/constants/constants';
+import { IsEmail, IsEnum, IsString, Length } from 'class-validator';
+import { ChefType } from 'src/constants/constants';
 
 export class LogInChefDto {
   @IsEmail()
@@ -10,6 +10,6 @@ export class LogInChefDto {
   @Length(8, 30)
   password: string;
 
-  @IsEnum(UserType)
+  @IsEnum(ChefType)
   type: string;
 }

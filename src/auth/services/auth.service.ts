@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Chef } from 'src/chef/entities/chef.entity';
 import { ChefService } from 'src/chef/services/chef.service';
-import { UserType } from 'src/constants/constants';
+import { ChefType, UserType } from 'src/constants/constants';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/services/users.service';
 
@@ -44,7 +44,7 @@ export class AuthService {
         phoneNumber,
       );
       entity = user;
-    } else if (type === UserType.CHEF) {
+    } else if (type === ChefType.CHEF) {
       const chef = await this.chefService.registerChef(
         email,
         hashedPassword,
@@ -66,7 +66,7 @@ export class AuthService {
       const isUser = await this.comparePasswords(password, user.password);
       if (!isUser) throw new BadRequestException('Contraseña incorrecta');
       entity = user;
-    } else if (type === UserType.CHEF) {
+    } else if (type === ChefType.CHEF) {
       const [chef] = await this.chefService.findChef(email);
       if (!chef) throw new NotFoundException('Chef not found');
       const isChef = await this.comparePasswords(password, chef.password);

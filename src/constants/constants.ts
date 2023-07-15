@@ -1,7 +1,10 @@
 export enum UserType {
   USER = 'user',
-  CHEF = 'chef',
   ADMIN = 'admin',
+}
+
+export enum ChefType {
+  CHEF = 'chef',
 }
 
 export enum OrderStatus {

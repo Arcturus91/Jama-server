@@ -17,14 +17,27 @@ export class OrdersService {
     @InjectRepository(Order) private orderRepo: Repository<Order>,
   ) {}
 
+  async findOrder(orderId: string): Promise<Order> {
+    const order = await this.orderRepo.findOne({
+      where: { id: orderId },
+    });
+    return order;
+  }
+
+  async findOrderDetail(orderId: string): Promise<Order> {
+    const orderWithMealDetail = await this.orderRepo.findOne({
+      where: { id: orderId },
+      relations: ['meal', 'user'],
+    });
+    return orderWithMealDetail;
+  }
+
   async updateOrder(
     mealId: string,
     quantity: number,
     orderId: string,
   ): Promise<Order> {
-    const previousOrder = await this.orderRepo.findOne({
-      where: { id: orderId },
-    });
+    const previousOrder = await this.findOrder(orderId);
     const orderedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
     const totalPrice = previousOrder.totalPrice + quantity * orderedMeal.price;
     await this.orderRepo.update(orderId, { totalPrice });
@@ -80,6 +93,12 @@ export class OrdersService {
       where: { id: orderId },
       relations: ['meal'],
     });
+  }
+
+  async updateOrderStatus(orderId: string, orderStatus: string) {
+    await this.orderRepo.update(orderId, { orderStatus });
+    const updatedOrder = await this.findOrder(orderId);
+    return updatedOrder;
   }
 }
 

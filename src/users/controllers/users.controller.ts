@@ -30,6 +30,7 @@ import { LogInUserDto } from '../dtos/login-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { CurrentAdmin } from '../decorators/current-admin.decorator';
 import { OrderStatus } from 'src/constants/constants';
+import { UpdateOrderDto } from 'src/orders/dtos/update-order-dto';
 
 @Controller()
 export class UsersController {
@@ -171,7 +172,7 @@ export class UsersController {
 
   @Get('/user/lastorder/:userid')
   @UseGuards(JwtAuthGuard)
-  async getLastUserOrder(@Param('userid') userid: string) {
+  async getLastUserOrder(@Param('userid') userid: string): Promise<Order> {
     const user = await this.usersService.findUserById(userid);
     const lastOrderId = user.orders[user.orders.length - 1].id;
     const getLastUserOrder = this.ordersService.userLastOrder(lastOrderId);
@@ -198,31 +199,53 @@ export class UsersController {
     return updatedUser;
   }
 
-  //necesito una ruta  de admin para definir un pedido como requested / onPreparation / ReadyToDeliver / Delivered
   //<-- Admin Routes -->
-  @Get('/admin/updatemeal/allpendingmeals')
+  @Get('/admin/allpendingorders')
   @UseGuards(JwtAuthGuard)
-  async getAllRequestedMeals(@CurrentAdmin() admin: User) {
-    OrderStatus.requested;
-    console.log(admin);
-    // retrieves all meals with status requested
-    // show their user, meal, price
+  async getAllPendingOrders(@CurrentAdmin() admin: User): Promise<Order[]> {
+    const allPendingOrders = await this.usersService.getAllPendingOrders(admin);
+    return allPendingOrders;
   }
 
-  /* @Patch()
-  async updateMealStatus(){
-    -encuentra el meal y lo actualiza para ser:
-    OrderStatus.onCooking
-    OrderStatus.onDelivery
-    OrderStatus.completed
-    al mismo tiempo que envía un mensaje SMS probablemente al chef, definitivamente al user.
+  @Patch('/admin/updateorder/:orderid')
+  @UseGuards(JwtAuthGuard)
+  async updateOrderStatus(
+    @Param('orderid') orderid: string,
+    @CurrentAdmin() admin: User,
+    @Body() body: UpdateOrderDto,
+  ) {
+    const orderToUpdate = await this.ordersService.findOrderDetail(orderid);
+    const { meal, user } = orderToUpdate;
 
-    en el front, el admin tiene una pantalla donde sel listan todas las comidas y le puedes cambiar de status sergún una lista desplegable.
+    console.log('order to update', orderToUpdate);
+
+    if (!orderToUpdate) {
+      throw new HttpException(
+        'No se encontró la orden',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const updatedOrder = await this.ordersService.updateOrderStatus(
+      orderid,
+      body.orderStatus,
+    );
+
+    this.twilioMessagingService.sendOrderStatusSMS(
+      orderid,
+      meal.name,
+      user.phoneNumber,
+      body.orderStatus,
+    );
+    return updatedOrder;
   }
-  */
 
   /* @Patch()
   update puntaje de chef, jalando a través de meal, al chef y pudiendo otorgarle una puntuación
   En el front, una vez que la orden esté en completed, le metes un coinditional rendering para mostrar el botón para calificar
   */
+
+  //! Cuando la comdida sea pedida, llega al admin como requested. Cuando se registra un pago
+  //! cambia a onCooking. Cuando el chef indica que está listo, cambia a onDelivery.
+  //! cuando el usuario confirma la llegada del meal, se da un completed.
 }

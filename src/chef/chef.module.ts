@@ -8,9 +8,10 @@ import { User } from 'src/users/entities/user.entity';
 import { AuthService } from 'src/auth/services/auth.service';
 import { UsersService } from 'src/users/services/users.service';
 import { ConfigService } from '@nestjs/config';
+import { Order } from 'src/orders/entities/orders.entities';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Chef, Meal, User])],
+  imports: [TypeOrmModule.forFeature([Chef, Meal, User, Order])],
   controllers: [ChefController],
   providers: [ChefService, AuthService, UsersService, Logger, ConfigService],
 })

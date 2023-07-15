@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Twilio } from 'twilio';
 import { ConfigService } from '@nestjs/config';
+import { OrderStatus } from 'src/constants/constants';
 
 @Injectable()
 export class TwilioMessagingService {
@@ -19,10 +20,11 @@ export class TwilioMessagingService {
   sendSMS(userId: string, mealName: string, clientNumber: string) {
     this.twilioSMSNumber = this.configService.get('TWILIO_SMS_SENDER_NUMBER');
     this.jamaSMSNumber = this.configService.get('JAMA_SMS_NUMBER');
+    const trimmedUserId = userId.slice(0, 5);
     console.log('jama sms number and ckienbt number', clientNumber);
     this.twilioClient.messages
       .create({
-        body: `Ha llegado un pedido de userId: ${userId}. Solicitó un: ${mealName}`,
+        body: `Ha llegado un pedido de userId: ${trimmedUserId}. Solicitó un: ${mealName}`,
         from: this.twilioSMSNumber,
         to: this.jamaSMSNumber,
       })
@@ -43,6 +45,31 @@ export class TwilioMessagingService {
       });
   }
 
+  sendOrderStatusSMS(
+    orderId: string,
+    mealName: string,
+    clientNumber: string,
+    orderStatus: string,
+  ) {
+    this.twilioSMSNumber = this.configService.get('TWILIO_SMS_SENDER_NUMBER');
+    this.jamaSMSNumber = this.configService.get('JAMA_SMS_NUMBER');
+    const trimmedOrderId = orderId.slice(0, 5);
+    const orderStatusSMS = this.orderStatusResponse(orderStatus);
+
+    this.twilioClient.messages
+      .create({
+        body: `Su orden: ${trimmedOrderId} con comida ${mealName} está ${orderStatusSMS}`,
+        from: this.twilioSMSNumber,
+        to: clientNumber,
+      })
+      .then((message) => {
+        console.log('message sent to client', message.sid);
+      })
+      .catch((error) => {
+        console.error('Error sending sms message:', error);
+      });
+  }
+
   sendWSP(userId: string, mealName: string) {
     this.twilioWspNumber = this.configService.get('TWILIO_WSP_SENDER_NUMBER');
     this.jamaWspNumber = this.configService.get('JAMA_WSP_NUMBER');
@@ -57,5 +84,19 @@ export class TwilioMessagingService {
       .catch((error) => {
         console.error('Error sending sms message:', error);
       });
+  }
+
+  private orderStatusResponse(orderStatus: string): string {
+    let orderStatusSMS: string;
+    switch (orderStatus) {
+      case OrderStatus.onCooking:
+        orderStatusSMS = 'En preparación';
+        break;
+      case OrderStatus.onDelivery:
+        orderStatusSMS = 'Lista para entrega';
+      case OrderStatus.completed:
+        orderStatusSMS = 'Completa';
+    }
+    return orderStatusSMS;
   }
 }

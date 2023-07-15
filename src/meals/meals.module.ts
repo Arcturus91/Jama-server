@@ -9,9 +9,10 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { UsersService } from 'src/users/services/users.service';
 import { ChefService } from 'src/chef/services/chef.service';
 import { ConfigService } from '@nestjs/config';
+import { Order } from 'src/orders/entities/orders.entities';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Meal, Chef, User])],
+  imports: [TypeOrmModule.forFeature([Meal, Chef, User, Order])],
   controllers: [MealsController],
   providers: [
     MealsService,

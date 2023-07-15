@@ -17,8 +17,9 @@ export class CreateUserDto {
   @IsString()
   phoneNumber: string;
 
+  @IsString()
   @IsEnum(UserType)
-  type;
+  type: string;
 
   @IsString()
   address: string;

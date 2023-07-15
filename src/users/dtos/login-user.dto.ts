@@ -10,6 +10,7 @@ export class LogInUserDto {
   @Length(8, 30)
   password: string;
 
+  @IsString()
   @IsEnum(UserType)
   type: string;
 }
