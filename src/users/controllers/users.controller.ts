@@ -213,7 +213,7 @@ export class UsersController {
     @Param('orderid') orderid: string,
     @CurrentAdmin() admin: User,
     @Body() body: UpdateOrderDto,
-  ) {
+  ): Promise<Order> {
     const orderToUpdate = await this.ordersService.findOrderDetail(orderid);
     const { meal, user } = orderToUpdate;
 
