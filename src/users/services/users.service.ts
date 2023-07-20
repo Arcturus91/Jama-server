@@ -146,7 +146,11 @@ export class UsersService {
       );
     }
     return this.orderRepo.find({
-      where: { orderStatus: OrderStatus.requested },
+      where: [
+        { orderStatus: OrderStatus.requested },
+        { orderStatus: OrderStatus.onCooking },
+        { orderStatus: OrderStatus.onDelivery },
+      ],
       relations: ['meal', 'user'],
     });
   }
