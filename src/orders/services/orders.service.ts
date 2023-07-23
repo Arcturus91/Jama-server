@@ -21,6 +21,11 @@ export class OrdersService {
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
     });
+
+    if (!order) {
+      throw new BadRequestException('Orden no encontrada');
+    }
+
     return order;
   }
 

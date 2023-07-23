@@ -3,7 +3,6 @@ import {
   Controller,
   Post,
   Get,
-  UseInterceptors,
   UseGuards,
   Param,
   Res,
@@ -18,7 +17,6 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { User } from '../entities/user.entity';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { CurrentUser } from '../decorators/current-user.decorator';
-import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import { OrdersService } from 'src/orders/services/orders.service';
 import { Order } from 'src/orders/entities/orders.entities';
 import { MealsService } from 'src/meals/services/meals.service';
@@ -31,6 +29,8 @@ import { UpdateUserDto } from '../dtos/update-user.dto';
 import { CurrentAdmin } from '../decorators/current-admin.decorator';
 import { OrderStatus } from 'src/constants/constants';
 import { UpdateOrderDto } from 'src/orders/dtos/update-order-dto';
+import { QualifyChefDto } from 'src/chef/dtos/qualify-chef.dto';
+import { ChefService } from 'src/chef/services/chef.service';
 
 @Controller()
 export class UsersController {
@@ -39,6 +39,7 @@ export class UsersController {
     private authService: AuthService,
     private ordersService: OrdersService,
     private mealsService: MealsService,
+    private chefService: ChefService,
     private twilioMessagingService: TwilioMessagingService,
   ) {}
 
@@ -92,7 +93,11 @@ export class UsersController {
 
   //!implement Guard: admin
   @Get('/user/getallusers')
-  getAllUsers(): Promise<User[]> {
+  @UseGuards(JwtAuthGuard)
+  getAllUsers(@CurrentAdmin() admin: User): Promise<User[]> {
+    if (!admin) {
+      throw new HttpException('User already exists', HttpStatus.FORBIDDEN);
+    }
     return this.usersService.getAllUsers();
   }
 
@@ -141,10 +146,6 @@ export class UsersController {
     //!implement notification for chef : nodemailer
     //!en el front, con la respuesta de este http response, el cliente recibe confirmación
     //!creería que se debe crear un servicio para notificar al chef y al admin. El admin tiene su guard. sería como un usuario pero con un guard especial
-  }
-
-  async putOrder() {
-    //requires validation of payment
   }
 
   //delete a user
@@ -199,6 +200,25 @@ export class UsersController {
     return updatedUser;
   }
 
+  @Post('/user/qualifychef')
+  @UseGuards(JwtAuthGuard)
+  async qualifyChef(@CurrentUser() _user: User, @Body() body: QualifyChefDto) {
+    const { orderId, mealId, userRatingToChef } = body;
+
+    const order = await this.ordersService.findOrder(orderId);
+    //validar que el order sea del user
+    if (order.orderStatus !== OrderStatus.completed) {
+      throw new HttpException(
+        'La orden debe estar completa para que pueda calificar',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const chef = await this.mealsService.getMealChef(mealId);
+
+    await this.chefService.implementRating(chef, userRatingToChef);
+  }
+
   //<-- Admin Routes -->
   @Get('/admin/allpendingorders')
   @UseGuards(JwtAuthGuard)
@@ -211,7 +231,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateOrderStatus(
     @Param('orderid') orderid: string,
-    @CurrentAdmin() admin: User,
+    @CurrentAdmin() _admin: User,
     @Body() body: UpdateOrderDto,
   ): Promise<Order> {
     const orderToUpdate = await this.ordersService.findOrderDetail(orderid);

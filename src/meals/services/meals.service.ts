@@ -85,4 +85,19 @@ export class MealsService {
       }
     }
   }
+
+  async getMealChef(mealId: string) {
+    const meal = await this.mealRepo.findOne({
+      where: { id: mealId },
+      relations: ['chef'],
+    });
+
+    if (meal.id !== mealId) {
+      throw new HttpException(
+        'No se encuentra este platillo',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return meal.chef;
+  }
 }

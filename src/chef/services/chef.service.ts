@@ -124,4 +124,25 @@ export class ChefService {
     chefToModify = { ...chefToModify, ...chefUpdate };
     return this.chefRepo.save(chefToModify);
   }
+
+  async implementRating(chef: Chef, userRatingToChef: number): Promise<void> {
+    const { id, rating, totalRatings } = chef;
+
+    if (rating === 0 || totalRatings === 0) {
+      await this.chefRepo.update(id, {
+        rating: userRatingToChef,
+        totalRatings: 1,
+      });
+      return;
+    }
+    const newTotalRatings = totalRatings + 1;
+    const newRating = Number(
+      ((rating + userRatingToChef) / newTotalRatings).toFixed(1),
+    );
+
+    await this.chefRepo.update(id, {
+      rating: newRating,
+      totalRatings: newTotalRatings,
+    });
+  }
 }

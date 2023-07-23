@@ -5,6 +5,7 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
@@ -13,12 +14,14 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { Order } from 'src/orders/entities/orders.entities';
 import { OrderStatus } from 'src/constants/constants';
+import { Chef } from 'src/chef/entities/chef.entity';
 /* import { sendWsp } from 'src/common/utils/twilio'; */
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(User) private chefRepo: Repository<Chef>,
     @InjectRepository(Meal) private mealRepo: Repository<Meal>,
     @InjectRepository(Order) private orderRepo: Repository<Order>,
   ) {}
@@ -154,4 +157,17 @@ export class UsersService {
       relations: ['meal', 'user'],
     });
   }
+
+/*   async qualifyChef(chefId: string, rating: number) {
+    const dataToUpdate = { rating };
+
+    try {
+      this.chefRepo.update(chefId, dataToUpdate);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Error actualizando el rating del chef.',
+        e.message,
+      );
+    }
+  } */
 }
