@@ -55,7 +55,6 @@ import { TwilioMessagingService } from './twilio/twilio.service';
   providers: [TwilioMessagingService],
 })
 export class AppModule implements NestModule {
-  //implements is for class-interface implementation
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }

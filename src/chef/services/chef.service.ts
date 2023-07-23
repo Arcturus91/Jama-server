@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -129,20 +130,36 @@ export class ChefService {
     const { id, rating, totalRatings } = chef;
 
     if (rating === 0 || totalRatings === 0) {
-      await this.chefRepo.update(id, {
-        rating: userRatingToChef,
-        totalRatings: 1,
-      });
+      try {
+        await this.chefRepo.update(id, {
+          rating: userRatingToChef,
+          totalRatings: 1,
+        });
+        Logger.log('@implementRating - Rating implemented');
+      } catch (e) {
+        throw new InternalServerErrorException(
+          'Error implementing rating order',
+          e.message,
+        );
+      }
       return;
     }
     const newTotalRatings = totalRatings + 1;
     const newRating = Number(
       ((rating + userRatingToChef) / newTotalRatings).toFixed(1),
     );
+    try {
+      await this.chefRepo.update(id, {
+        rating: newRating,
+        totalRatings: newTotalRatings,
+      });
 
-    await this.chefRepo.update(id, {
-      rating: newRating,
-      totalRatings: newTotalRatings,
-    });
+      Logger.log('@implementRating - Rating implemented');
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'Error implementing rating order',
+        e.message,
+      );
+    }
   }
 }

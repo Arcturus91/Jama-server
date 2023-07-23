@@ -10,6 +10,9 @@ import {
   HttpStatus,
   HttpException,
   Patch,
+  ForbiddenException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -74,7 +77,7 @@ export class UsersController {
     if (type === 'chef')
       throw new HttpException(
         'No puedes logearte como usuario, Chef',
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.FORBIDDEN,
       );
     const { entity, token } = await this.authService.login(
       email,
@@ -96,7 +99,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   getAllUsers(@CurrentAdmin() admin: User): Promise<User[]> {
     if (!admin) {
-      throw new HttpException('User already exists', HttpStatus.FORBIDDEN);
+      throw new ForbiddenException(
+        'Tienes que ser admin para revisar esta ruta.',
+      );
     }
     return this.usersService.getAllUsers();
   }
@@ -189,9 +194,8 @@ export class UsersController {
   ): Promise<User> {
     if (body.phoneNumber.length === 9) {
       if (!validatePhoneNumber(body.phoneNumber)) {
-        throw new HttpException(
+        throw new BadRequestException(
           'El número de teléfono ingresado parece incorrecto',
-          HttpStatus.BAD_REQUEST,
         );
       }
       body.phoneNumber = '+51' + body.phoneNumber;
@@ -202,12 +206,18 @@ export class UsersController {
 
   @Post('/user/qualifychef')
   @UseGuards(JwtAuthGuard)
-  async qualifyChef(@CurrentUser() _user: User, @Body() body: QualifyChefDto) {
+  async qualifyChef(@CurrentUser() user: User, @Body() body: QualifyChefDto) {
     const { orderId, mealId, userRatingToChef } = body;
 
-    const order = await this.ordersService.findOrder(orderId);
-    //validar que el order sea del user
-    if (order.orderStatus !== OrderStatus.completed) {
+    const orderDetail = await this.ordersService.findOrderDetail(orderId);
+
+    if (orderDetail.user.id !== user.id) {
+      throw new ForbiddenException(
+        'No puedes calificar una orden que no es tuya',
+      );
+    }
+
+    if (orderDetail.orderStatus !== OrderStatus.completed) {
       throw new HttpException(
         'La orden debe estar completa para que pueda calificar',
         HttpStatus.BAD_REQUEST,
@@ -240,10 +250,7 @@ export class UsersController {
     console.log('order to update', orderToUpdate);
 
     if (!orderToUpdate) {
-      throw new HttpException(
-        'No se encontró la orden',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new NotFoundException('No se encontró la orden');
     }
 
     const updatedOrder = await this.ordersService.updateOrderStatus(

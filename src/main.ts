@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
+import { AllExceptionsFilter } from './common/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,9 +20,9 @@ async function bootstrap() {
       'http://localhost:5005',
       'https://jama-client.up.railway.app',
     ],
-    credentials: true, // Set credentials to true
+    credentials: true,
   });
-
+  app.useGlobalFilters(new AllExceptionsFilter());
   const port = app.get(ConfigService).get('PORT');
   await app.listen(port || 5005);
 }

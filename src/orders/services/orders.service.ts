@@ -106,17 +106,3 @@ export class OrdersService {
     return updatedOrder;
   }
 }
-
-/*   async addMealToOrder(
-        user: User,
-        mealId: string,
-        quantity: number,
-        orderId: any,
-      ) {
-        const orderedMeal = await this.mealRepo.findOne({ where: { id: mealId } });
-        const previousOrder = await this.orderRepo.findOne({
-          where: { id: orderId },
-        });
-    
-        const updatedOrder = await this.orderRepo.update(orderId,{})
-      } */

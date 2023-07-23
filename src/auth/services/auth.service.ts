@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -31,7 +31,13 @@ export class AuthService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  async signup(email, password, type, address, phoneNumber): Promise<any> {
+  async signup(
+    email: string,
+    password: string,
+    type: string,
+    address: string,
+    phoneNumber: string,
+  ): Promise<any> {
     phoneNumber = '+51' + phoneNumber;
     let entity: User | Chef;
     const hashedPassword = await this.hashPassword(password);
@@ -58,32 +64,32 @@ export class AuthService {
     return data;
   }
   /*   Promise<User | Chef>  */
-  async login(email, password, type): Promise<any> {
+  async login(email: string, password: string, type: string): Promise<any> {
     let entity: User | Chef;
     if (type === UserType.USER) {
       const [user] = await this.usersService.findUser(email);
       if (!user) throw new NotFoundException('User not found');
       const isUser = await this.comparePasswords(password, user.password);
-      if (!isUser) throw new BadRequestException('Contraseña incorrecta');
+      if (!isUser) throw new UnauthorizedException('Contraseña incorrecta');
       entity = user;
     } else if (type === ChefType.CHEF) {
       const [chef] = await this.chefService.findChef(email);
       if (!chef) throw new NotFoundException('Chef not found');
       const isChef = await this.comparePasswords(password, chef.password);
-      if (!isChef) throw new BadRequestException('Contraseña incorrecta');
+      if (!isChef) throw new UnauthorizedException('Contraseña incorrecta');
       entity = chef;
     } else if (type === UserType.ADMIN) {
       const [admin] = await this.usersService.findUser(email);
       if (!admin) throw new NotFoundException('Admin no encontrado');
       const isAdmin = await this.comparePasswords(password, admin.password);
-      if (!isAdmin) throw new BadRequestException('Contraseña incorrecta');
+      if (!isAdmin) throw new UnauthorizedException('Contraseña incorrecta');
       entity = admin;
     }
 
     const data = await this.dataJwtSignedGenerator(entity);
     return data;
   }
-  getCookieWithJwtToken(token) {
+  getCookieWithJwtToken(token: string) {
     const JWT_EXPIRATION_TIME = '3600';
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${JWT_EXPIRATION_TIME}`;
   }
